@@ -21,6 +21,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cmdParser.h">
+    <ClCompile Include="MangaDex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MangaDex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

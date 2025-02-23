@@ -1,0 +1,10 @@
+.vs/
+*.ipch
+*.suo
+*.db
+*.vcxproj
+*.vcxproj.filters
+*.suo
+*.db
+*.ipch
+*.backup.json

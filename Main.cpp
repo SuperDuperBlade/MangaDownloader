@@ -1,4 +1,5 @@
-#include "cmdParser.h"
+
+#include "libs/cmdParser.h"
 #include  "iostream"
 #include "string"
 
@@ -17,7 +18,18 @@ int main(int argc,char* argv[]) {
 	parser.passArguments(argc, argv);
 
 	mangaID = parser.getArgument(mangaID_identifier);
+
 	outputDir = parser.getArgument(outputDir_identifier);
 
+
+
+	if (parser.doesArgExist(outputDir_identifier)) {
+		outputDir = parser.getArgument(outputDir_identifier);
+	
+	}
+	else
+	{
+
+	}
 
 }

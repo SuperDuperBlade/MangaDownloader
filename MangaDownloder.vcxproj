@@ -131,6 +131,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cmdParser.h" />
+    <ClCompile Include="MangaDex.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MangaDex.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

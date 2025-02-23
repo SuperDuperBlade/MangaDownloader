@@ -18,9 +18,12 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MangaDex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cmdParser.h">
+    <ClInclude Include="MangaDex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

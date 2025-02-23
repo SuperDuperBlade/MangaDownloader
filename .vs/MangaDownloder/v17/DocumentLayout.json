@@ -7,8 +7,12 @@
       "RelativeMoniker": "D:0:0:{D97A18C4-2096-409E-B1CC-522E686F5D54}|MangaDownloder.vcxproj|solutionrelative:Main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{D97A18C4-2096-409E-B1CC-522E686F5D54}|MangaDownloder.vcxproj|A:\\cpp\\projects\\MangaDownloder\\cmdParser.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{D97A18C4-2096-409E-B1CC-522E686F5D54}|MangaDownloder.vcxproj|solutionrelative:cmdParser.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{D97A18C4-2096-409E-B1CC-522E686F5D54}|MangaDownloder.vcxproj|A:\\cpp\\projects\\MangaDownloder\\MangaDex.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{D97A18C4-2096-409E-B1CC-522E686F5D54}|MangaDownloder.vcxproj|solutionrelative:MangaDex.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{D97A18C4-2096-409E-B1CC-522E686F5D54}|MangaDownloder.vcxproj|A:\\cpp\\projects\\MangaDownloder\\MangaDex.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{D97A18C4-2096-409E-B1CC-522E686F5D54}|MangaDownloder.vcxproj|solutionrelative:MangaDex.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -18,19 +22,32 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "cmdParser.h",
-              "DocumentMoniker": "A:\\cpp\\projects\\MangaDownloder\\cmdParser.h",
-              "RelativeDocumentMoniker": "cmdParser.h",
-              "ToolTip": "A:\\cpp\\projects\\MangaDownloder\\cmdParser.h",
-              "RelativeToolTip": "cmdParser.h",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "MangaDex.cpp",
+              "DocumentMoniker": "A:\\cpp\\projects\\MangaDownloder\\MangaDex.cpp",
+              "RelativeDocumentMoniker": "MangaDex.cpp",
+              "ToolTip": "A:\\cpp\\projects\\MangaDownloder\\MangaDex.cpp",
+              "RelativeToolTip": "MangaDex.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-02-23T14:13:28.959Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MangaDex.h",
+              "DocumentMoniker": "A:\\cpp\\projects\\MangaDownloder\\MangaDex.h",
+              "RelativeDocumentMoniker": "MangaDex.h",
+              "ToolTip": "A:\\cpp\\projects\\MangaDownloder\\MangaDex.h",
+              "RelativeToolTip": "MangaDex.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2025-02-23T13:11:24.014Z",
+              "WhenOpened": "2025-02-23T14:04:02.41Z",
               "EditorCaption": ""
             },
             {
@@ -41,7 +58,7 @@
               "RelativeDocumentMoniker": "Main.cpp",
               "ToolTip": "A:\\cpp\\projects\\MangaDownloder\\Main.cpp",
               "RelativeToolTip": "Main.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAABAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2025-02-21T18:39:47.945Z",
               "EditorCaption": ""

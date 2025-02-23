@@ -1,0 +1,17 @@
+﻿  Main.cpp
+A:\cpp\projects\MangaDownloader\libs\cmdParser.h(27,11): warning C4200: nonstandard extension used: zero-sized array in struct/union
+  (compiling source file 'Main.cpp')
+      A:\cpp\projects\MangaDownloader\libs\cmdParser.h(27,11):
+      This member will be ignored by a defaulted constructor or copy/move assignment operator
+  
+A:\cpp\projects\MangaDownloader\libs\cmdParser.h(103,12): warning C4551: function call missing argument list
+  (compiling source file 'Main.cpp')
+  
+A:\cpp\projects\MangaDownloader\libs\cmdParser.h(112,12): warning C4551: function call missing argument list
+  (compiling source file 'Main.cpp')
+  
+  MangaDex.cpp
+  Generating Code...
+  MangaDownloader.vcxproj -> A:\cpp\projects\MangaDownloader\x64\Debug\MangaDownloader.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.

@@ -1,22 +1,23 @@
 
-#include "libs/cmdParser.h"
-#include  "iostream"
-#include "string"
 
-using namespace std;
+#include "libs/cmdParser.h"
+#include  <iostream>
+#include "MangaDex.h"
+
 int main(int argc,char* argv[]) {
 
 	//Handling and assining of the arguments
 
-	string mangaID, outputDir;
-	const string mangaID_identifier = "-i";
-	const string outputDir_identifier = "-o";
+	std::string mangaID, outputDir;
+	 std::string mangaID_identifier = "-i";
+	 std::string outputDir_identifier = "-o";
 
 	cmdParser parser(true);
 	parser.addOption(mangaID_identifier, "The id of the manga you want to download from mangaDex", true, true);
 	parser.addOption(outputDir_identifier, "The directory you want to write the manga to (defualt is the dir the script is running in)", false, true);
 	parser.passArguments(argc, argv);
 
+	
 	mangaID = parser.getArgument(mangaID_identifier);
 
 	outputDir = parser.getArgument(outputDir_identifier);
@@ -31,5 +32,7 @@ int main(int argc,char* argv[]) {
 	{
 
 	}
+	MangaDex dex(mangaID, outputDir);
 
+	dex.getCoverFileName();
 }

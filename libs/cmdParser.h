@@ -41,6 +41,9 @@ public:
             error("All of the required arguments where not put!");
             return false;
         }
+        if (getNumberOfRequiredArguments() > 0 && numberOfArgs == 1) {
+            error("None of the the required args where put!");
+        }
 
         
         //starts at 1 instead of position 0 as the first argument is the executable

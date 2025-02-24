@@ -1,5 +1,5 @@
 #include "MangaDex.h"
-
+#include "libs/Fastson.h"
 
 MangaDex::MangaDex(std::string mangaID ,std::string outputDir) {
 	this->mangaID = mangaID;
@@ -26,13 +26,19 @@ std::string MangaDex::sendRequestUsingBASEURL(std::string addonURl) {
 		std::cout << "Encountered error" << to_string(res.error()) << '\n';
 	}
 
+	std::cout << "starting parsing \n";
+	
 	return res->body;
 }
 
 
 //Gets the title of the manga
 std::string MangaDex::getTitle(std::string mangaID) {
-	return "";
+	std::string responce = sendRequestUsingBASEURL(BASEURL_COVER + mangaID);
+	std::string title = Fastson::fastSearchValue_fromFirst(responce, "title");
+
+	std::cout << "Title:" << title << '\n';
+	return title;
 }
 std::string MangaDex::getTitle() {
 	return	this->getTitle(this->mangaID);
@@ -40,8 +46,10 @@ std::string MangaDex::getTitle() {
 
 std::string MangaDex::getCoverFileName(std::string mangaID) {
 	std::string responce = sendRequestUsingBASEURL(BASEURL_COVER + mangaID);
-	std::cout << "responce" << '\n';
-	return "";
+	std::string title = Fastson::fastSearchValue_fromFirst(responce, "title");
+
+	std::cout << "Title: " << title << '\n';
+	return title;
 }
 std::string MangaDex::getCoverFileName() {
 	getCoverFileName(mangaID);

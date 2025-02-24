@@ -34,5 +34,5 @@ int main(int argc,char* argv[]) {
 	}
 	MangaDex dex(mangaID, outputDir);
 
-	dex.getCoverFileName();
+	dex.getTitle();
 }

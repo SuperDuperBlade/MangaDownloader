@@ -1,4 +1,6 @@
 .vs/
+MangaDownloader/
+x64/
 *.ipch
 *.suo
 *.db

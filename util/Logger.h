@@ -20,7 +20,7 @@ public:
 		localtime_s(&local_time, &currentTime);
 
 		std::stringstream timeStream;
-		timeStream << std::put_time(&local_time, "[%d-%m-%Y] [%H:%M:%S] :");
+		timeStream << std::put_time(&local_time, "[%d-%m-%Y] [%H:%M:%S]: ");
 		return timeStream.str();
 	}
 	//TODO add the option to write to a file

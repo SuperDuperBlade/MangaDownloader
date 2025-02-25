@@ -10,8 +10,6 @@ public:
 	Fastson();
 	static std::string perpareJsonForParsing(std::string json) {
 		json.erase(std::remove(json.begin(), json.end(), '"'), json.end());
-		json.erase(std::remove(json.begin(), json.end(), '['), json.end());
-		json.erase(std::remove(json.begin(), json.end(), ']'), json.end());
 		return json;
 	}
 	//prone to be buggy be carefull with this
@@ -42,8 +40,7 @@ public:
 		}
 		return values;
 	}
-	
-private:
 
+	
 };
 

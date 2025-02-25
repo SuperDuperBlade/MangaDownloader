@@ -28,13 +28,12 @@ int main(int argc,char* argv[]) {
 
 	if (parser.doesArgExist(outputDir_identifier)) {
 		outputDir = parser.getArgument(outputDir_identifier);
-	
 	}
-	else
-	{
-
+	else{
+		outputDir ;
 	}
 	MangaDex dex(mangaID, outputDir,logger);
 
 	dex.getTitle();
+	dex.getMangaMetaData();
 }

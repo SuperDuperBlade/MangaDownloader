@@ -7,12 +7,25 @@
 #include "libs/httplib.h"
 #include <iostream>
 #include <vector>
-#include "util/Fastson.h"
+#include <algorithm>
+#include <string>
 #include "util/FileHandler.h"
 #include "util/Logger.h"
+#include "libs/simdjson.h"
 
+struct chapterInfo {
+	std::string title;
+	std::string hash;
+	std::vector<std::string> fileNames_data;
+	std::vector<std::string> fileNames_datasaver;
+};
+struct volumeInfo {
+	std::string title;
+	std::vector<chapterInfo> chapters;
+};
 class MangaDex
 {
+	
 	public:
 		MangaDex(std::string, std::string, Logger*);
 		MangaDex(std::string,Logger*);
@@ -32,6 +45,8 @@ class MangaDex
 		//bool isChapterInLang(std::string);
 		
 		bool writeMangaToDisk(std::string dir, std::string mode);
+		std::vector<volumeInfo> getMangaMetaData();
+		std::string convertFromViewToString(std::string_view value);
 		//bool writeMangaToDisk(std::string mode);
 		std::string sendRequestUsingBASEURL(std::string addonURL);
 		
@@ -42,7 +57,9 @@ class MangaDex
 		//URLS
 		void init();
 		const std::string BASEURL = "https://api.mangadex.org";
-		const std::string BASEURL_COVER = "/manga/";
+		const std::string BASEURL_MANGA = "/manga/";
+
+		
 
 		const std::string BASEDOWNLOAD_URL = "https://uploads.mangadex.org";
 

@@ -1,15 +1,15 @@
 #include "MangaDex.h"
 
 
-MangaDex::MangaDex(std::string mangaID ,std::string outputDir,Logger logger) {
+MangaDex::MangaDex(std::string mangaID ,std::string outputDir,Logger* logger) {
 	this->mangaID = mangaID;
 	this->outputDir = outputDir;
-	this->log = logger;
+	this->logg = logger;
 	this->init();
 }
-MangaDex::MangaDex(std::string mangaID,Logger logger) {
+MangaDex::MangaDex(std::string mangaID,Logger* logger) {
 	this->mangaID = mangaID;
-	this->log = logger;
+	this->logg = logger;
 	this->init();
 }
 
@@ -23,7 +23,7 @@ std::string MangaDex::sendRequestUsingBASEURL(std::string addonURl) {
 	std::cout << "Sending request to: " << BASEURL + addonURl << '\n';
 	auto res = this->baseCli.Get(addonURl);
 	if (res) {
-		log.log("Success: " + res->body);
+		this->logg->log("Success: " + res->body);
 	}else {
 		std::cout << "Encountered error" << to_string(res.error()) << '\n';
 	}

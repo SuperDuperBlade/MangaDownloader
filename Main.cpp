@@ -3,7 +3,7 @@
 #include "libs/cmdParser.h"
 #include  <iostream>
 #include "MangaDex.h"
-#include "libs/Logger.h"
+#include "util/Logger.h"
 int main(int argc,char* argv[]) {
 
 	//Handling and assining of the arguments
@@ -11,7 +11,7 @@ int main(int argc,char* argv[]) {
 	std::string mangaID, outputDir;
 	const std::string mangaID_identifier = "-i";
 	const std::string outputDir_identifier = "-o";
-	const Logger logger{};
+	Logger* logger = new Logger();
 
 
 	cmdParser parser(true);

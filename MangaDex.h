@@ -14,8 +14,8 @@
 class MangaDex
 {
 	public:
-		MangaDex(std::string, std::string, Logger);
-		MangaDex(std::string,Logger);
+		MangaDex(std::string, std::string, Logger*);
+		MangaDex(std::string,Logger*);
 	//	MangaDex();
 	//	std::string getMangaInfo(std::string);
 //		std::string getMangaInfo();
@@ -37,7 +37,7 @@ class MangaDex
 		
 	private: 
 		std::string mangaID, outputDir;
-		Logger log;
+		Logger* logg;
 
 		//URLS
 		void init();

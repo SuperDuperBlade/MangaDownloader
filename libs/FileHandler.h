@@ -4,12 +4,12 @@
 #include <sys/stat.h>
 #include <filesystem>
 #include <fstream>
-static class FileHandler
+ class FileHandler
 {
 public:
-	std::stringstream getFileContents_stream();
-	std::string getFileContents();
-	bool checkIfExists(std::string filepath, bool createIfNotFound);
+	static std::stringstream getFileContents_stream();
+	static std::string getFileContents();
+	static bool checkIfExists(std::string filepath, bool createIfNotFound);
 private:
 
 };

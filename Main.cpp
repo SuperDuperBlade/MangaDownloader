@@ -3,7 +3,7 @@
 #include "libs/cmdParser.h"
 #include  <iostream>
 #include "MangaDex.h"
-
+#include "libs/Logger.h"
 int main(int argc,char* argv[]) {
 
 	//Handling and assining of the arguments

@@ -7,7 +7,10 @@
 #include "libs/httplib.h"
 #include <iostream>
 #include <vector>
-
+#include "libs/Fastson.h"
+#include "libs/FileHandler.h"
+#include "libs/logger.h"
+namespace Logger as util;
 class MangaDex
 {
 	public:
@@ -28,7 +31,7 @@ class MangaDex
 		
 		//bool isChapterInLang(std::string);
 		
-	//	bool writeMangaToDisk(std::string dir, std::string mode);
+		bool writeMangaToDisk(std::string dir, std::string mode);
 		//bool writeMangaToDisk(std::string mode);
 		std::string sendRequestUsingBASEURL(std::string addonURL);
 		

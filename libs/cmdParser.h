@@ -51,7 +51,6 @@ public:
             string u_arg = argv[i];
             bool was_found = false;
 
-
             for (argument arg: arguments){
                 if(arg.identifier == u_arg ){
                     if (arg.subtype){

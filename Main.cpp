@@ -9,8 +9,10 @@ int main(int argc,char* argv[]) {
 	//Handling and assining of the arguments
 
 	std::string mangaID, outputDir;
-	 std::string mangaID_identifier = "-i";
-	 std::string outputDir_identifier = "-o";
+	const std::string mangaID_identifier = "-i";
+	const std::string outputDir_identifier = "-o";
+	const Logger logger{};
+
 
 	cmdParser parser(true);
 	parser.addOption(mangaID_identifier, "The id of the manga you want to download from mangaDex", true, true);
@@ -32,7 +34,7 @@ int main(int argc,char* argv[]) {
 	{
 
 	}
-	MangaDex dex(mangaID, outputDir);
+	MangaDex dex(mangaID, outputDir,logger);
 
 	dex.getTitle();
 }

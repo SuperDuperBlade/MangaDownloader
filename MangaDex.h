@@ -7,15 +7,15 @@
 #include "libs/httplib.h"
 #include <iostream>
 #include <vector>
-#include "libs/Fastson.h"
-#include "libs/FileHandler.h"
-#include "libs/logger.h"
-namespace Logger as util;
+#include "util/Fastson.h"
+#include "util/FileHandler.h"
+#include "util/Logger.h"
+
 class MangaDex
 {
 	public:
-		MangaDex(std::string, std::string);
-		MangaDex(std::string);
+		MangaDex(std::string, std::string, Logger);
+		MangaDex(std::string,Logger);
 	//	MangaDex();
 	//	std::string getMangaInfo(std::string);
 //		std::string getMangaInfo();
@@ -37,7 +37,7 @@ class MangaDex
 		
 	private: 
 		std::string mangaID, outputDir;
-		
+		Logger log;
 
 		//URLS
 		void init();

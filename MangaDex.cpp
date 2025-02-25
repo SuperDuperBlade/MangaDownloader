@@ -1,13 +1,15 @@
 #include "MangaDex.h"
-#include "libs/Fastson.h"
 
-MangaDex::MangaDex(std::string mangaID ,std::string outputDir) {
+
+MangaDex::MangaDex(std::string mangaID ,std::string outputDir,Logger logger) {
 	this->mangaID = mangaID;
 	this->outputDir = outputDir;
+	this->log = logger;
 	this->init();
 }
-MangaDex::MangaDex(std::string mangaID) {
+MangaDex::MangaDex(std::string mangaID,Logger logger) {
 	this->mangaID = mangaID;
+	this->log = logger;
 	this->init();
 }
 
@@ -21,7 +23,7 @@ std::string MangaDex::sendRequestUsingBASEURL(std::string addonURl) {
 	std::cout << "Sending request to: " << BASEURL + addonURl << '\n';
 	auto res = this->baseCli.Get(addonURl);
 	if (res) {
-		std::cout << "success: "<<res->body<< '\n';
+		log.log("Success: " + res->body);
 	}else {
 		std::cout << "Encountered error" << to_string(res.error()) << '\n';
 	}
@@ -55,3 +57,13 @@ std::string MangaDex::getCoverFileName() {
 	getCoverFileName(mangaID);
 	return "";
 }
+bool MangaDex::writeMangaToDisk(std::string dir, std::string mode) {
+	if (!FileHandler::checkIfExists(dir, true)) {
+		
+	}
+	
+
+
+	return false;
+}
+

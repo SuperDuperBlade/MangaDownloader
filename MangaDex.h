@@ -9,6 +9,8 @@
 #include <vector>
 #include <algorithm>
 #include <string>
+#include <chrono>
+#include <thread>
 #include "util/FileHandler.h"
 #include "util/Logger.h"
 #include "libs/simdjson.h"
@@ -47,18 +49,30 @@ class MangaDex
 		bool writeMangaToDisk(std::string dir, std::string mode);
 		std::vector<volumeInfo> getMangaMetaData();
 		std::string convertFromViewToString(std::string_view value);
+		bool isChapterInDesiredLang(std::string chapterID, std::string lang);
+
+		bool isChapterInDesiredLang(std::string chapterID, std::string lang, std::string* responce);
+
+		std::string getFirstValueFromJson(simdjson::ondemand::array object);
+
+	
+
+
 		//bool writeMangaToDisk(std::string mode);
 		std::string sendRequestUsingBASEURL(std::string addonURL);
 		
 	private: 
 		std::string mangaID, outputDir;
+		int rateLimit = 20; //defualt
 		Logger* logg;
+
 
 		//URLS
 		void init();
 		const std::string BASEURL = "https://api.mangadex.org";
 		const std::string BASEURL_MANGA = "/manga/";
-
+		const std::string BASEURL_CHAPTER = "/chapter/";
+		const std::string BASEURL_CHAPTER_IMAGES = "/at-home/server/";;
 		
 
 		const std::string BASEDOWNLOAD_URL = "https://uploads.mangadex.org";

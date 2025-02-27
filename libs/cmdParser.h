@@ -1,3 +1,4 @@
+#pragma once
 #include <map>
 #include <string>
 #include <any>
@@ -6,7 +7,7 @@
 #include <format>
 using namespace std;
 
-class cmdParser
+class CmdParser
 {
     struct argument{
         string identifier = "";
@@ -27,8 +28,11 @@ private:
     char* argv[];
 public:
 
-    cmdParser(bool exit_If_Failed){
+    CmdParser(bool exit_If_Failed){
         this->exit_On_Fail = exit_If_Failed;
+    }
+    CmdParser() {
+        this->exit_On_Fail = true; //defualt
     }
 
 

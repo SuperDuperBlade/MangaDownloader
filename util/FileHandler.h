@@ -12,6 +12,12 @@
 public:
 	static std::stringstream getFileContents_stream();
 	static std::string getFileContents();
+
+	static std::string getWorkingDirectory() {
+		return std::filesystem::current_path().string();
+	}
+
+
 	//Checks if a file exits and if createIfNotFound is set to true then the file/directory will be created
 	static bool checkIfExists(std::string filepath, bool createIfNotFound) {
 		struct stat buffer;
@@ -33,6 +39,12 @@ public:
 		}
 		return result;
 	}
+	static void writeToFile(std::string filepath, std::string content) {
+		std::ofstream file;
+		file.open(filepath,std::ios_base::app);
 
+		file << content;
+		file.close();
+	}
 
 };

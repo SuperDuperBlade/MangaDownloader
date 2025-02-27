@@ -14,8 +14,9 @@
 #include "util/FileHandler.h"
 #include "util/Logger.h"
 #include "libs/simdjson.h"
-
+#include "libs/cmdParser.h"
 struct chapterInfo {
+	std::string id;
 	std::string title;
 	std::string hash;
 	std::vector<std::string> fileNames_data;
@@ -29,8 +30,8 @@ class MangaDex
 {
 	
 	public:
-		MangaDex(std::string, std::string, Logger*);
-		MangaDex(std::string,Logger*);
+		MangaDex(CmdParser* parser, Logger* logger);
+
 	//	MangaDex();
 	//	std::string getMangaInfo(std::string);
 //		std::string getMangaInfo();
@@ -49,6 +50,7 @@ class MangaDex
 		bool writeMangaToDisk(std::string dir, std::string mode);
 		std::vector<volumeInfo> getMangaMetaData();
 		std::string convertFromViewToString(std::string_view value);
+		void getFilesInChapter(chapterInfo* cinfo,std::string chapterID);
 		bool isChapterInDesiredLang(std::string chapterID, std::string lang);
 
 		bool isChapterInDesiredLang(std::string chapterID, std::string lang, std::string* responce);
@@ -65,6 +67,7 @@ class MangaDex
 		std::string mangaID, outputDir;
 		int rateLimit = 20; //defualt
 		Logger* logg;
+		CmdParser* parser;
 
 
 		//URLS

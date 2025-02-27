@@ -10,3 +10,4 @@ x64/
 *.db
 *.ipch
 *.backup.json
+log.txt

@@ -6,12 +6,14 @@
 #include <iomanip>
 #include <sstream>
 #include <iostream>
+#include "FileHandler.h"
 
 class Logger {
 private:
 	bool exitOnFailure;
 	const std::string defualtErrorMessage{ "Encountred a error: " };
 	std::string errorMessage = defualtErrorMessage;
+	std::string logFilePath = FileHandler::getWorkingDirectory() + "\\log.txt";
 public:
 	//gets the current time in a format
 	std::string getTimeFormatted() {
@@ -26,6 +28,9 @@ public:
 	//TODO add the option to write to a file
 	void log(std::string message) {
 		std::string timeFormatted{ getTimeFormatted() };
+
+		FileHandler::writeToFile(this->logFilePath,timeFormatted+message+"\n");
+
 		std::cout << timeFormatted << message << '\n';
 	}
 	void errorLog(std::string message) {

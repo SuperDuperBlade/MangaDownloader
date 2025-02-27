@@ -41,8 +41,7 @@ public:
 	}
 	static void writeToFile(std::string filepath, std::string content) {
 		std::ofstream file;
-		file.open(filepath,std::ios_base::app);
-
+		file.open(filepath, std::ios_base::app);
 		file << content;
 		file.close();
 	}

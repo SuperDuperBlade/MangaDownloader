@@ -1,6 +1,5 @@
 #include "MangaDex.h"
 
-
 MangaDex::MangaDex(CmdParser* parser, Logger* logger) {
 	
 	this->parser = parser;
@@ -60,7 +59,7 @@ std::string MangaDex::getTitle(std::string mangaID) {
 std::string MangaDex::getTitle() {
 	return	this->getTitle(this->mangaID);
 }
-
+//TODO
 std::string MangaDex::getCoverFileName(std::string mangaID) {
 
 
@@ -70,23 +69,93 @@ std::string MangaDex::getCoverFileName() {
 	getCoverFileName(mangaID);
 	return "";
 }
+//used for downloading files from the api
+std::string MangaDex::sendRequestUsingBASEDOWNLOAD_URL(std::string addonURL) {
+	this->logg->log("Sending get request to: " + this->BASEURL + addonURL);
+	auto res = this->baseDownloadCli.Get(addonURL);
+	if (res) {
+		this->logg->log("Success: " + this->BASEURL + addonURL);
+	}
+	else if (res->status == 429) {
+		logg->log("Encountered rate limit waiting 20 seconds... before trying again");
+		std::this_thread::sleep_for(std::chrono::seconds(this->rateLimit));
+		sendRequestUsingBASEDOWNLOAD_URL(addonURL);
+	}
+	else {
+		logg->errorLog("Encountered error: " + std::to_string(res->status) + " , " + to_string(res.error()) + '\n');
+	}
+
+	return res->body;
+}
 
 
-bool MangaDex::writeMangaToDisk(std::string dir, std::string mode) {
+bool MangaDex::writeMangaToDisk(std::string dir, std::string mode,std::string data_setting) {
 	if (!FileHandler::checkIfExists(dir, true)) {
 		logg->log("Dir:" + dir + " ,not found attempting to create");
 	}
 	
-	std::vector<volumeInfo> manga = getMangaMetaData();
-		
+	mangaInfo manga = getMangaMetaData();
 	
+
+	//TODO sanitise
+	std::string manga_dir = this->outputDir + "\\" + manga.title;
+	std::string name_prefix = manga.title;
+
+	FileHandler::checkIfExists(manga_dir,true);
+
+	if (mode == "volumes") {
+		for (volumeInfo vinfo : manga.vinfos) {
+			std::string volumeDir = manga_dir+"\\" +vinfo.title+ "_" + name_prefix;
+			FileHandler::checkIfExists(volumeDir,true);
+			long counter = 0;
+			for (chapterInfo cinfo: vinfo.chapters) {
+				std::string chapterHash = cinfo.hash;
+				if (data_setting == "data") {
+					for (std::string file : cinfo.fileNames_data) {
+						//retrives file and writes to directory
+						std::string filepath = volumeDir + "\\" + std::to_string(counter)+"_"+file;
+						std::string addonURL = this->FILEDOWNLOAD_URL_DATA+chapterHash + "/"+file;
+						std::string responce = sendRequestUsingBASEDOWNLOAD_URL(addonURL);
+						FileHandler::writeToFile(filepath, responce);
+						counter++;
+					}
+				}else if (data_setting == "saver") {
+					for (std::string file : cinfo.fileNames_datasaver) {
+						//retrives file and writes to directory
+						std::string filepath = volumeDir + "\\" + std::to_string(counter) + "_" + file;
+						std::string addonURL = this->FILEDOWNLOAD_URL_DATA + chapterHash + "/" + file;
+						std::string responce = sendRequestUsingBASEDOWNLOAD_URL(addonURL);
+						FileHandler::writeToFile(filepath, responce);
+						counter++;
+					}
+				}
+				else {
+					//No data setting found exiting
+					logg->errorLog("Wrong data setting check -help for details", true);
+				}
+			}
+		}
+	}else if (mode == "chapters") {
+
+	}else if(mode == "manga"){
+
+	}
+	else {
+		logg->errorLog("Unknown mode: " + mode + "do -help for available options");
+	}
 
 
 
 	return false;
 }
+
+
+
 //gets the correct chapters sorts them into their respective volumes and gets the files for the respective chapters needed for parsing
-std::vector<volumeInfo> MangaDex::getMangaMetaData() {
+mangaInfo MangaDex::getMangaMetaData() {
+	
+	mangaInfo mngInfo;
+	mngInfo.title = getTitle();
 
 	std::vector<volumeInfo> volumes;
 	std::string mangaTitle = getTitle(this->mangaID);
@@ -161,7 +230,8 @@ std::vector<volumeInfo> MangaDex::getMangaMetaData() {
 	}
 	//volumes are in reverse order unreverse them
 	std::reverse(volumes.begin(), volumes.end());
-	return volumes;
+	mngInfo.vinfos = volumes;
+	return mngInfo;
 }
 std::string MangaDex::convertFromViewToString(std::string_view value) {
 	std::string temp{ value };
@@ -185,21 +255,16 @@ void MangaDex::getFilesInChapter(chapterInfo* cinfo,std::string chapterID) {
 	}
 }
 
-
-
 //Checks if the chapter is in the desired language
 bool MangaDex::isChapterInDesiredLang(std::string chapterID, std::string lang,std::string* responce) {
 	std::string request = sendRequestUsingBASEURL(this->BASEURL_CHAPTER + chapterID);
 	responce = new std::string(request);
 	simdjson::ondemand::parser parser;
 	auto json = parser.iterate(request);
-
-
 		std::string language = convertFromViewToString(json["data"]["attributes"]["translatedLanguage"].get_string().value());
 		if (language == lang) {
 			logg->log("Chapter:" + chapterID + " matches the target language");
 			return true;
 		}
 		return false;
-	
 }

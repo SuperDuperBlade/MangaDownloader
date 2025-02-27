@@ -26,6 +26,10 @@ struct volumeInfo {
 	std::string title;
 	std::vector<chapterInfo> chapters;
 };
+struct mangaInfo {
+	std::string title;
+	std::vector<volumeInfo> vinfos;
+};
 class MangaDex
 {
 	
@@ -38,6 +42,7 @@ class MangaDex
 		std::string getTitle();
 		std::string getCoverFileName(std::string mangaID);
 		std::string getCoverFileName();
+		std::string sendRequestUsingBASEDOWNLOAD_URL(std::string url);
 		std::string getTitle(std::string title);
 		//std::vector<std::string> getAllChaptersInManga();
 		//std::vector<std::string> getAllChaptersInVolume();
@@ -48,7 +53,8 @@ class MangaDex
 		//bool isChapterInLang(std::string);
 		
 		bool writeMangaToDisk(std::string dir, std::string mode);
-		std::vector<volumeInfo> getMangaMetaData();
+		bool writeMangaToDisk(std::string dir, std::string mode, std::string data_setting);
+		mangaInfo getMangaMetaData();
 		std::string convertFromViewToString(std::string_view value);
 		void getFilesInChapter(chapterInfo* cinfo,std::string chapterID);
 		bool isChapterInDesiredLang(std::string chapterID, std::string lang);
@@ -79,6 +85,8 @@ class MangaDex
 		
 
 		const std::string BASEDOWNLOAD_URL = "https://uploads.mangadex.org";
+		const std::string FILEDOWNLOAD_URL_DATA = "/data/";
+		const std::string FILEDOWNLOAD_URL_DATASAVER = "/data-saver/";
 
 
 		httplib::Client baseCli{ BASEURL };

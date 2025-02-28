@@ -53,6 +53,7 @@ class MangaDex
 		//bool isChapterInLang(std::string);
 		
 		bool writeMangaToDisk( std::string mode, std::string data_setting);
+		bool writeMangaToDisk();
 		mangaInfo getMangaMetaData();
 		std::string convertFromViewToString(std::string_view value);
 		void getFilesInChapter(chapterInfo* cinfo,std::string chapterID);

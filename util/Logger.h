@@ -15,6 +15,11 @@ private:
 	std::string errorMessage = defualtErrorMessage;
 	std::string logFilePath = FileHandler::getWorkingDirectory() + "\\log.txt";
 public:
+	
+	void whereisLogFile() {
+		log("Log file is at: " + logFilePath);
+	}
+
 	//gets the current time in a format
 	std::string getTimeFormatted() {
 		std::time_t currentTime{ std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) };
@@ -56,4 +61,3 @@ public:
 	}
 
 };
-

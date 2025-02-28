@@ -13,6 +13,7 @@ void MangaDex::init() {
 		this->outputDir = parser->getArgument("-o");
 	}
 	else {
+		logg->errorLog("Working directory not found setting to the working directory", false);
 		this->outputDir = FileHandler::getWorkingDirectory();
 	}
 	if (parser->doesArgExist("-m")) {
@@ -20,16 +21,19 @@ void MangaDex::init() {
 	}
 	else {
 		//defualt
+		logg->errorLog("mode not set setting it to defualt (volumes)", false);
 		this->mode = "volumes";
 	}
 	if (parser->doesArgExist("-dt")) {
 		this->quality = parser->getArgument("-dt");
 	}else {
+		logg->errorLog("quality option not found setting it to defualt (data)", false);
 		//defualt
 		this->quality = "data";
 	}
+	logg->whereisLogFile();
 }
-
+//Sends a get request using the base url
 std::string MangaDex::sendRequestUsingBASEURL(std::string addonURl) {
 	this->logg->log("Sending get request to: " + this->BASEURL + addonURl);
 	auto res = this->baseCli.Get(addonURl);
@@ -69,6 +73,7 @@ std::string MangaDex::getTitle(std::string mangaID) {
 	logg->errorLog("Title for mangaID:" + mangaID + " was not found");
 	return "unkown";
 }
+//returns the title of the manga using the id provided in the cmd
 std::string MangaDex::getTitle() {
 	return	this->getTitle(this->mangaID);
 }
@@ -104,7 +109,8 @@ std::string MangaDex::sendRequestUsingBASEDOWNLOAD_URL(std::string addonURL) {
 
 bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 
-	logg->log(outputDir);
+	logg->log(mode);
+	
 
 	if (!FileHandler::checkIfExists(this->outputDir, true)) {
 		logg->log("Dir:" + this->outputDir + " ,not found attempting to create");
@@ -114,44 +120,54 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 	manga.title = getTitle();
 
 	//TODO sanitise
-	std::string manga_dir; 
-	std::string name_prefix = manga.title;
+	std::string manga_dir = this->outputDir + "\\" + manga.title;
+	const std::string name_prefix = manga.title;
+	const std::string base_DIR{ this->outputDir+"\\"+manga.title};
 	
 	FileHandler::checkIfExists(manga_dir,true);
 
 	
-	 
+	 //if the mode is not volumes or chapter then it will defualt to manga
 		for (volumeInfo vinfo : manga.vinfos) {
-			manga_dir = this->outputDir + "\\" + manga.title;
 			
-			if(mode == "volumes") manga_dir = manga_dir+"\\" +"v" + vinfo.title + "_" + name_prefix;
+			//all the files in a specific volume go to the corrasponding directory
+			if(mode == "volumes") manga_dir = base_DIR+"\\" +"v" + vinfo.title + "_" + name_prefix;
 			
 			FileHandler::checkIfExists(manga_dir,true);
 			long chapterCounter{ 0 };
 			long fileCounter{ 0 };
 
-			std::string chapterDir;
+			
 
 			for (chapterInfo cinfo: vinfo.chapters) {
-				std::string chapterHash = cinfo.hash;
+				chapterCounter++;
 
-				if (mode == "chapters") {
-				
+
+				std::string chapterHash = cinfo.hash;
+				//if chapter is empty then it will be set to its index
+				if (cinfo.title == "") {
+					cinfo.title = std::to_string(chapterCounter);
 				}
+				//all the files in a chapter go to a corrasponding directory
+				if (mode == "chapter") manga_dir = base_DIR+"\\"+"v" + vinfo.title+"_" + "c" + cinfo.title + "_" + name_prefix;
 				
-				if (data_setting == "data") {
+
+				//Creates the dir in advance
+				FileHandler::mkdir(manga_dir);
+
+				if (data_setting == "data" || data_setting == "both") {
 					for (std::string file : cinfo.fileNames_data) {
 						//retrives file and writes to directory
-						std::string filepath = manga_dir + "\\" + std::to_string(fileCounter)+"_"+file;
+						std::string filepath = manga_dir + "\\data\\" + std::to_string(fileCounter)+"_"+file;
 						std::string addonURL = this->FILEDOWNLOAD_URL_DATA+chapterHash + "/"+file;
 						std::string responce = sendRequestUsingBASEDOWNLOAD_URL(addonURL);
 						FileHandler::createImageFile(filepath, responce);
 						fileCounter++;
 					}
-				}else if (data_setting == "saver") {
+				}else if (data_setting == "saver" || data_setting == "both") {
 					for (std::string file : cinfo.fileNames_datasaver) {
 						//retrives file and writes to directory
-						std::string filepath = manga_dir + "\\" + std::to_string(fileCounter) + "_" + file;
+						std::string filepath = manga_dir + "\\data_saver\\" + std::to_string(fileCounter) + "_" + file;
 						std::string addonURL = this->FILEDOWNLOAD_URL_DATA + chapterHash + "/" + file;
 						std::string responce = sendRequestUsingBASEDOWNLOAD_URL(addonURL);
 						FileHandler::createImageFile(filepath, responce);
@@ -162,15 +178,20 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 					//No data setting found exiting
 					logg->errorLog("Wrong data setting check -help for details", true);
 				}
+
+				//reset the manga_dir directory for the next chapter
+				
+
 			}
+			
 		}
-	
-
-
-
 	return false;
 }
-
+//uses varibles provided via cmd instead
+bool MangaDex::writeMangaToDisk() {
+	this->writeMangaToDisk(this->mode,this->quality);
+	return true;
+}
 
 
 //gets the correct chapters sorts them into their respective volumes and gets the files for the respective chapters needed for parsing
@@ -187,11 +208,16 @@ mangaInfo MangaDex::getMangaMetaData() {
 	auto json = parser.iterate(responce);
 	simdjson::ondemand::object volumes_c = json["volumes"].get_object();
 	
+
+	
+
 	for (auto volume : volumes_c) {
 		volumeInfo vinfo;
 		vinfo.title = convertFromViewToString(volume.key_raw_json_token());
 
 		for (auto chapter : json["volumes"][vinfo.title]["chapters"].get_object()) {
+			
+
 			std::string chatperN = convertFromViewToString(chapter.key_raw_json_token());
 			std::string chapterID = convertFromViewToString(json["volumes"][vinfo.title]["chapters"][chatperN]["id"].get_string().value());
 			
@@ -214,7 +240,7 @@ mangaInfo MangaDex::getMangaMetaData() {
 					}
 					catch (simdjson::simdjson_error e) {
 						logg->errorLog(e.what());
-						logg->log("Title not found setting the title to it's hash");
+						logg->log("Title not found setting the title to blank");
 						cinfo.title = "";
 					}
 					getFilesInChapter(&cinfo, chapterID);
@@ -239,8 +265,8 @@ mangaInfo MangaDex::getMangaMetaData() {
 							}
 							catch (simdjson::simdjson_error e) {
 								logg->errorLog(e.what());
-								logg->log("Title not found leaving setting the title to it's hash");
-								cinfo.title = cinfo.hash;
+								logg->log("Title not found leaving setting the title to blank");
+								cinfo.title = "";
 							}
 							getFilesInChapter(&cinfo, sID);
 							vinfo.chapters.push_back(cinfo);

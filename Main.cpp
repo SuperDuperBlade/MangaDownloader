@@ -23,9 +23,6 @@ int main(int argc,char* argv[]) {
 	parser.passArguments(argc, argv);
 	
 	MangaDex dex(&parser,logger);
-	std::cout << FileHandler::getWorkingDirectory();
-	dex.getTitle();
-	dex.init();
-	//dex.getMangaMetaData();
-	dex.writeMangaToDisk("volumes","data");
+
+	dex.writeMangaToDisk();
 }

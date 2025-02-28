@@ -27,20 +27,25 @@ public:
 		
 		struct stat buffer;
 		bool result = stat(filepath.c_str(), &buffer) == 0;
+		try {
+			if (!result && createIfNotFound) {
+				if (buffer.st_mode & S_IFDIR) {
+					std::filesystem::create_directories(filepath);
+				}
+				else if (buffer.st_mode & S_IFREG) {
+					std::ofstream createdFile(filepath);
+					createdFile.close();
+				}
+				else {
+					//unkown item 
+					std::filesystem::create_directories(filepath);
 
-		if (!result && createIfNotFound) {
-			if (buffer.st_mode & S_IFDIR) {
-				std::filesystem::create_directories(filepath);
+				}
 			}
-			else if (buffer.st_mode & S_IFREG) {
-				std::ofstream createdFile(filepath);
-				createdFile.close();
-			}
-			else {
-				//unkown item 
-				std::filesystem::create_directories(filepath);
+		}catch (const std::exception& e) {
 			
-			}
+			std::cout << "Encountered error using filepath: "+filepath <<"\n" << e.what() << "\n";
+			exit(-1);
 		}
 		return result;
 	}
@@ -55,6 +60,9 @@ public:
 		file.open(filepath, std::ios_base::binary);
 		file.write(content.c_str(),content.size());
 		file.close();
+	}
+	static void mkdir(std::string filepath) {
+		std::filesystem::create_directories(filepath);
 	}
 
 };

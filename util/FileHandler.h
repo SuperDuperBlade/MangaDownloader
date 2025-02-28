@@ -24,7 +24,7 @@ public:
 
 	//Checks if a file exits and if createIfNotFound is set to true then the file/directory will be created
 	static bool checkIfExists(std::string filepath, bool createIfNotFound) {
-		std::cout << filepath;
+		
 		struct stat buffer;
 		bool result = stat(filepath.c_str(), &buffer) == 0;
 
@@ -39,7 +39,7 @@ public:
 			else {
 				//unkown item 
 				std::filesystem::create_directories(filepath);
-				exit(-1);
+			
 			}
 		}
 		return result;

@@ -142,12 +142,7 @@ public:
     }
 
     bool doesArgExist(string identifier) {
-        for (argument arg : arguments) {
-            if (arg.identifier == identifier) {
-                return true;
-            }
-        }
-        return false;
+        return userArgument_values[identifier] != "";
     }
 
 };

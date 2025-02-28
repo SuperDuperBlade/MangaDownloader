@@ -10,10 +10,23 @@ MangaDex::MangaDex(CmdParser* parser, Logger* logger) {
 void MangaDex::init() {
 	this->mangaID = parser->getArgument("-i");
 	if (parser->doesArgExist("-o")) {
-		outputDir = parser->getArgument("-o");
+		this->outputDir = parser->getArgument("-o");
 	}
 	else {
-		outputDir = FileHandler::getWorkingDirectory();
+		this->outputDir = FileHandler::getWorkingDirectory();
+	}
+	if (parser->doesArgExist("-m")) {
+		this->mode = parser->getArgument("-m");
+	}
+	else {
+		//defualt
+		this->mode = "volumes";
+	}
+	if (parser->doesArgExist("-dt")) {
+		this->quality = parser->getArgument("-dt");
+	}else {
+		//defualt
+		this->quality = "data";
 	}
 }
 
@@ -89,13 +102,16 @@ std::string MangaDex::sendRequestUsingBASEDOWNLOAD_URL(std::string addonURL) {
 }
 
 
-bool MangaDex::writeMangaToDisk(std::string dir, std::string mode,std::string data_setting) {
-	if (!FileHandler::checkIfExists(dir, true)) {
-		logg->log("Dir:" + dir + " ,not found attempting to create");
+bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
+
+	logg->log(outputDir);
+
+	if (!FileHandler::checkIfExists(this->outputDir, true)) {
+		logg->log("Dir:" + this->outputDir + " ,not found attempting to create");
 	}
 	
 	mangaInfo manga = getMangaMetaData();
-	
+	manga.title = getTitle();
 
 	//TODO sanitise
 	std::string manga_dir = this->outputDir + "\\" + manga.title;
@@ -111,6 +127,7 @@ bool MangaDex::writeMangaToDisk(std::string dir, std::string mode,std::string da
 			for (chapterInfo cinfo: vinfo.chapters) {
 				std::string chapterHash = cinfo.hash;
 				if (data_setting == "data") {
+					logg->log("here");
 					for (std::string file : cinfo.fileNames_data) {
 						//retrives file and writes to directory
 						std::string filepath = volumeDir + "\\" + std::to_string(counter)+"_"+file;

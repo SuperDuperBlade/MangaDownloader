@@ -52,8 +52,7 @@ class MangaDex
 		
 		//bool isChapterInLang(std::string);
 		
-		bool writeMangaToDisk(std::string dir, std::string mode);
-		bool writeMangaToDisk(std::string dir, std::string mode, std::string data_setting);
+		bool writeMangaToDisk( std::string mode, std::string data_setting);
 		mangaInfo getMangaMetaData();
 		std::string convertFromViewToString(std::string_view value);
 		void getFilesInChapter(chapterInfo* cinfo,std::string chapterID);
@@ -64,20 +63,20 @@ class MangaDex
 		std::string getFirstValueFromJson(simdjson::ondemand::array object);
 
 	
-
+		void init();
 
 		//bool writeMangaToDisk(std::string mode);
 		std::string sendRequestUsingBASEURL(std::string addonURL);
 		
 	private: 
-		std::string mangaID, outputDir;
+		std::string mangaID{}, outputDir{}, mode{}, quality{};
 		int rateLimit = 20; //defualt
 		Logger* logg;
 		CmdParser* parser;
 
 
 		//URLS
-		void init();
+	
 		const std::string BASEURL = "https://api.mangadex.org";
 		const std::string BASEURL_MANGA = "/manga/";
 		const std::string BASEURL_CHAPTER = "/chapter/";

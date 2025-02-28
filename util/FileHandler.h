@@ -1,11 +1,15 @@
 #pragma once
 #ifndef _FileHandler
 #define _FileHandler
+
+#define WIN32_LEAN_AND_MEAN 
+#include <windows.h>
 #include <iostream>
 #include <sstream>
 #include <sys/stat.h>
 #include <filesystem>
 #include <fstream>
+
 #endif
  class FileHandler
 {
@@ -14,12 +18,13 @@ public:
 	static std::string getFileContents();
 
 	static std::string getWorkingDirectory() {
-		return std::filesystem::current_path().string();
+			return std::filesystem::temp_directory_path().generic_string();
 	}
 
 
 	//Checks if a file exits and if createIfNotFound is set to true then the file/directory will be created
 	static bool checkIfExists(std::string filepath, bool createIfNotFound) {
+		std::cout << filepath;
 		struct stat buffer;
 		bool result = stat(filepath.c_str(), &buffer) == 0;
 
@@ -32,8 +37,8 @@ public:
 				createdFile.close();
 			}
 			else {
-				//unkown item error
-				std::cerr << "Unable to determine file type: " << filepath << "\n" << "Exiting... \n";
+				//unkown item 
+				std::filesystem::create_directories(filepath);
 				exit(-1);
 			}
 		}

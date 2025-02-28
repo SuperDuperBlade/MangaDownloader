@@ -114,39 +114,48 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 	manga.title = getTitle();
 
 	//TODO sanitise
-	std::string manga_dir = this->outputDir + "\\" + manga.title;
+	std::string manga_dir; 
 	std::string name_prefix = manga.title;
 	
 	FileHandler::checkIfExists(manga_dir,true);
 
-	if (mode == "volumes") {
+	
 	 
 		for (volumeInfo vinfo : manga.vinfos) {
-		
-			std::string volumeDir = manga_dir+"\\" +"v" + vinfo.title + "_" + name_prefix;
-			logg->log(volumeDir);
-			FileHandler::checkIfExists(volumeDir,true);
-			long counter = 0;
+			manga_dir = this->outputDir + "\\" + manga.title;
+			
+			if(mode == "volumes") manga_dir = manga_dir+"\\" +"v" + vinfo.title + "_" + name_prefix;
+			
+			FileHandler::checkIfExists(manga_dir,true);
+			long chapterCounter{ 0 };
+			long fileCounter{ 0 };
+
+			std::string chapterDir;
+
 			for (chapterInfo cinfo: vinfo.chapters) {
 				std::string chapterHash = cinfo.hash;
+
+				if (mode == "chapters") {
+				
+				}
+				
 				if (data_setting == "data") {
-					logg->log("here");
 					for (std::string file : cinfo.fileNames_data) {
 						//retrives file and writes to directory
-						std::string filepath = volumeDir + "\\" + std::to_string(counter)+"_"+file;
+						std::string filepath = manga_dir + "\\" + std::to_string(fileCounter)+"_"+file;
 						std::string addonURL = this->FILEDOWNLOAD_URL_DATA+chapterHash + "/"+file;
 						std::string responce = sendRequestUsingBASEDOWNLOAD_URL(addonURL);
 						FileHandler::createImageFile(filepath, responce);
-						counter++;
+						fileCounter++;
 					}
 				}else if (data_setting == "saver") {
 					for (std::string file : cinfo.fileNames_datasaver) {
 						//retrives file and writes to directory
-						std::string filepath = volumeDir + "\\" + std::to_string(counter) + "_" + file;
+						std::string filepath = manga_dir + "\\" + std::to_string(fileCounter) + "_" + file;
 						std::string addonURL = this->FILEDOWNLOAD_URL_DATA + chapterHash + "/" + file;
 						std::string responce = sendRequestUsingBASEDOWNLOAD_URL(addonURL);
 						FileHandler::createImageFile(filepath, responce);
-						counter++;
+						fileCounter++;
 					}
 				}
 				else {
@@ -155,14 +164,7 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 				}
 			}
 		}
-	}else if (mode == "chapters") {
-
-	}else if(mode == "manga"){
-
-	}
-	else {
-		logg->errorLog("Unknown mode: " + mode + "do -help for available options");
-	}
+	
 
 
 
@@ -232,6 +234,9 @@ mangaInfo MangaDex::getMangaMetaData() {
 							cinfo.id = sID;
 							cinfo.title = convertFromViewToString(chapter_json["data"]["attributes"]["title"].get_string().value());
 							getFilesInChapter(&cinfo, sID);
+
+
+							logg->log(cinfo.title);
 
 							vinfo.chapters.push_back(cinfo);
 							wasChapterFound = true;

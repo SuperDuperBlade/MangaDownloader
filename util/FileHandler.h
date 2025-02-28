@@ -53,7 +53,7 @@ public:
 	static void createImageFile(std::string filepath, std::string content) {
 		std::ofstream file;
 		file.open(filepath, std::ios_base::binary);
-		file << content;
+		file.write(content.c_str(),content.size());
 		file.close();
 	}
 

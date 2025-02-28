@@ -120,9 +120,10 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 	FileHandler::checkIfExists(manga_dir,true);
 
 	if (mode == "volumes") {
-		
+	 
 		for (volumeInfo vinfo : manga.vinfos) {
-			std::string volumeDir = manga_dir+"\\" +vinfo.title+ "_" + name_prefix;
+		
+			std::string volumeDir = manga_dir+"\\" +"v" + vinfo.title + "_" + name_prefix;
 			logg->log(volumeDir);
 			FileHandler::checkIfExists(volumeDir,true);
 			long counter = 0;
@@ -135,7 +136,7 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 						std::string filepath = volumeDir + "\\" + std::to_string(counter)+"_"+file;
 						std::string addonURL = this->FILEDOWNLOAD_URL_DATA+chapterHash + "/"+file;
 						std::string responce = sendRequestUsingBASEDOWNLOAD_URL(addonURL);
-						FileHandler::writeToFile(filepath, responce);
+						FileHandler::createImageFile(filepath, responce);
 						counter++;
 					}
 				}else if (data_setting == "saver") {
@@ -144,7 +145,7 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 						std::string filepath = volumeDir + "\\" + std::to_string(counter) + "_" + file;
 						std::string addonURL = this->FILEDOWNLOAD_URL_DATA + chapterHash + "/" + file;
 						std::string responce = sendRequestUsingBASEDOWNLOAD_URL(addonURL);
-						FileHandler::writeToFile(filepath, responce);
+						FileHandler::createImageFile(filepath, responce);
 						counter++;
 					}
 				}
@@ -244,12 +245,13 @@ mangaInfo MangaDex::getMangaMetaData() {
 				}
 			
 		}
-		volumes.push_back(vinfo);
+		
 		for (volumeInfo vol : volumes) {
 			logg->log(vol.chapters.size() + "a");
 		}
 		//chapters are in reverse order unreverse them
 		std::reverse(vinfo.chapters.begin(),vinfo.chapters.end());
+		volumes.push_back(vinfo);
 	}
 	//volumes are in reverse order unreverse them
 	std::reverse(volumes.begin(), volumes.end());

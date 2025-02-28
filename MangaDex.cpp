@@ -210,7 +210,7 @@ mangaInfo MangaDex::getMangaMetaData() {
 					cinfo.id = chapterID;
 					try {
 						//most of the time mangaDex does not give the title so for now will just be using the chapter number
-						cinfo.title = convertFromViewToString(chapter_json["data"]["attributes"]["title"].get_string().value());
+						cinfo.title = convertFromViewToString(chapter_json["data"]["attributes"]["chapter"].get_string().value());
 					}
 					catch (simdjson::simdjson_error e) {
 						logg->errorLog(e.what());
@@ -243,10 +243,6 @@ mangaInfo MangaDex::getMangaMetaData() {
 								cinfo.title = cinfo.hash;
 							}
 							getFilesInChapter(&cinfo, sID);
-
-
-						
-
 							vinfo.chapters.push_back(cinfo);
 							wasChapterFound = true;
 							break;

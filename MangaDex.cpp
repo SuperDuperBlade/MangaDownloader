@@ -84,10 +84,10 @@ std::string MangaDex::getCoverFileName() {
 }
 //used for downloading files from the api
 std::string MangaDex::sendRequestUsingBASEDOWNLOAD_URL(std::string addonURL) {
-	this->logg->log("Sending get request to: " + this->BASEURL + addonURL);
+	this->logg->log("Sending get request to: " + this->BASEDOWNLOAD_URL + addonURL);
 	auto res = this->baseDownloadCli.Get(addonURL);
 	if (res) {
-		this->logg->log("Success: " + this->BASEURL + addonURL);
+		this->logg->log("Success: " + this->BASEDOWNLOAD_URL + addonURL);
 	}
 	else if (res->status == 429) {
 		logg->log("Encountered rate limit waiting 20 seconds... before trying again");
@@ -116,12 +116,14 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 	//TODO sanitise
 	std::string manga_dir = this->outputDir + "\\" + manga.title;
 	std::string name_prefix = manga.title;
-
+	
 	FileHandler::checkIfExists(manga_dir,true);
 
 	if (mode == "volumes") {
+		
 		for (volumeInfo vinfo : manga.vinfos) {
 			std::string volumeDir = manga_dir+"\\" +vinfo.title+ "_" + name_prefix;
+			logg->log(volumeDir);
 			FileHandler::checkIfExists(volumeDir,true);
 			long counter = 0;
 			for (chapterInfo cinfo: vinfo.chapters) {
@@ -181,7 +183,7 @@ mangaInfo MangaDex::getMangaMetaData() {
 	simdjson::ondemand::parser parser;
 	auto json = parser.iterate(responce);
 	simdjson::ondemand::object volumes_c = json["volumes"].get_object();
-
+	
 	for (auto volume : volumes_c) {
 		volumeInfo vinfo;
 		vinfo.title = convertFromViewToString(volume.key_raw_json_token());
@@ -242,12 +244,19 @@ mangaInfo MangaDex::getMangaMetaData() {
 				}
 			
 		}
+		volumes.push_back(vinfo);
+		for (volumeInfo vol : volumes) {
+			logg->log(vol.chapters.size() + "a");
+		}
 		//chapters are in reverse order unreverse them
 		std::reverse(vinfo.chapters.begin(),vinfo.chapters.end());
 	}
 	//volumes are in reverse order unreverse them
 	std::reverse(volumes.begin(), volumes.end());
 	mngInfo.vinfos = volumes;
+
+	
+
 	return mngInfo;
 }
 std::string MangaDex::convertFromViewToString(std::string_view value) {
@@ -265,6 +274,7 @@ void MangaDex::getFilesInChapter(chapterInfo* cinfo,std::string chapterID) {
 	for (auto obj : json["chapter"]["data"].get_array()) {
 		std::string filename = convertFromViewToString(obj.get_string().value());
 		cinfo->fileNames_data.push_back(filename);
+		logg->log(filename);
 	}
 	for (auto obj : json["chapter"]["dataSaver"].get_array()) {
 		std::string filename = convertFromViewToString(obj.get_string().value());

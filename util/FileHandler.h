@@ -18,8 +18,20 @@ public:
 	static std::stringstream getFileContents_stream();
 	static std::string getFileContents();
 
+	
+	//For now just gets the temp directory
 	static std::string getWorkingDirectory() {
 			return std::filesystem::temp_directory_path().generic_string();
+	}
+
+	//removes problamatic values from the filename
+	static std::string sanitiseFileName(std::string filename) {
+		std::vector<char> prohibitedChars = {'#','/', '\\', ':', '*', '?', '<', '>', '|','"'};
+
+		for (char item : prohibitedChars) {
+			filename.erase(std::remove(filename.begin(),filename.end(),item));
+		}
+		return filename;
 	}
 
 

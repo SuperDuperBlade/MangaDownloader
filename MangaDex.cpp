@@ -117,8 +117,8 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 	mangaInfo manga = getMangaMetaData();
 	manga.title = getTitle();
 
-	//TODO sanitise
-	std::string manga_dir = this->outputDir + "\\" + manga.title;
+
+	std::string manga_dir = this->outputDir + "\\" + FileHandler::sanitiseFileName(manga.title);
 	const std::string name_prefix = manga.title;
 	const std::string base_DIR{ this->outputDir+"\\"+manga.title};
 	

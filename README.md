@@ -6,6 +6,9 @@ Downlods a manga from mangadex using their api
 ```cmd
  pathToProgram -i MangaID -o outputDir (optinal)
 ```
+## Other arguments
+ -m : the configuration the manga will be downloded in options are manga , volume (defualt) ,chapter
+ -dt : quality of the files being used , options are data (fullquality which is the defualt) or datasaver (reduced quality saving space)
 
 # Libarires used
  - cmdParser: https://github.com/SuperDuperBlade/cmdParser

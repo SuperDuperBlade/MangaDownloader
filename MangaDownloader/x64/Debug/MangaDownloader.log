@@ -1,6 +1,6 @@
 ﻿  Main.cpp
 A:\cpp\projects\MangaDownloader\Main.cpp(3,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-A:\cpp\projects\MangaDownloader\util\FileHandler.h(102,12): warning C4244: 'initializing': conversion from 'std::streamoff' to 'int', possible loss of data
+A:\cpp\projects\MangaDownloader\util\FileHandler.h(118,12): warning C4244: 'initializing': conversion from 'std::streamoff' to 'int', possible loss of data
   (compiling source file 'Main.cpp')
   
 A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11): warning C4200: nonstandard extension used: zero-sized array in struct/union
@@ -15,7 +15,7 @@ A:\cpp\projects\MangaDownloader\libs\cmdParser.h(115,12): warning C4551: functio
   (compiling source file 'Main.cpp')
   
   MangaDex.cpp
-A:\cpp\projects\MangaDownloader\util\FileHandler.h(102,12): warning C4244: 'initializing': conversion from 'std::streamoff' to 'int', possible loss of data
+A:\cpp\projects\MangaDownloader\util\FileHandler.h(118,12): warning C4244: 'initializing': conversion from 'std::streamoff' to 'int', possible loss of data
   (compiling source file 'MangaDex.cpp')
   
 A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11): warning C4200: nonstandard extension used: zero-sized array in struct/union

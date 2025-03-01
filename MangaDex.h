@@ -46,13 +46,6 @@ class MangaDex
 		std::string getCoverFileName();
 		std::string sendRequestUsingBASEDOWNLOAD_URL(std::string url);
 		std::string getTitle(std::string title);
-		//std::vector<std::string> getAllChaptersInManga();
-		//std::vector<std::string> getAllChaptersInVolume();
-		//std::vector<std::string> getAllVolumes();
-		//std::string getVolumeName();
-		//std::string getChapterName();
-		
-		//bool isChapterInLang(std::string);
 		
 		bool writeMangaToDisk( std::string mode, std::string data_setting);
 		bool writeMangaToDisk();
@@ -65,23 +58,16 @@ class MangaDex
 
 		bool isChapterInDesiredLang(std::string chapterID, std::string lang, std::string* responce);
 
-
-
-	
-		void init();
-
 		//bool writeMangaToDisk(std::string mode);
 		std::string sendRequestUsingBASEURL(std::string addonURL);
 		
 	private: 
-		std::string mangaID{}, outputDir{}, mode{}, quality{};
+		std::string mangaID{}, outputDir{}, mode{}, quality{}, desiredLanguage{};
 		int rateLimit = 20; //defualt
 		Logger* logg;
 		CmdParser* parser;
 
-
 		//URLS
-	
 		const std::string BASEURL = "https://api.mangadex.org";
 		const std::string BASEURL_MANGA = "/manga/";
 		const std::string BASEURL_CHAPTER = "/chapter/";
@@ -92,14 +78,17 @@ class MangaDex
 		const std::string FILEDOWNLOAD_URL_DATA = "/data/";
 		const std::string FILEDOWNLOAD_URL_DATASAVER = "/data-saver/";
 
-
+		//https clients
 		httplib::Client baseCli{ BASEURL };
 		httplib::Client baseDownloadCli{BASEDOWNLOAD_URL};
 
-
+		//cmd arguments
 		const std::string mangaID_identifier = "-i";
 		const std::string outputDir_identifier = "-o";
 		const std::string mode_identifier = "-m";
 		const std::string quality_identifier = "-dt";
+		const std::string language_identifier = "-l";
+		const std::string baseURL_identifier = "-burl";
+		const std::string downloadURL_identifier = "-durl";
 };
 

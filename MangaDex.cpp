@@ -1,7 +1,6 @@
 #include "MangaDex.h"
 
 MangaDex::MangaDex(CmdParser* parser, Logger* logger,int argc,char* argv[]) {
-	
 	this->parser = parser;
 	this->logg = logger;
 	this->init(argc, argv);
@@ -10,11 +9,15 @@ MangaDex::MangaDex(CmdParser* parser, Logger* logger,int argc,char* argv[]) {
 void MangaDex::init(int argc,char* argv[]) {
 
 
-
+	//parser configuration
 	parser->addOption(mangaID_identifier, "The id of the manga you want to download from mangaDex", true, true);
 	parser->addOption(outputDir_identifier, "The directory you want to write the manga to (defualt is the dir the script is running in)", false, true);
 	parser->addOption(mode_identifier, "The mode you want to download the manga in can be either volumes , chapters or manga.", false, true);
 	parser->addOption(quality_identifier, "The quality of the downloaded images , lower quality will take up less space. options: data , datasaver, both", false, true);
+	parser->addOption(language_identifier, "The language the mangaWill be downlaoded in (shorthand) defualt is en (english) ", false, true);
+	parser->addOption(baseURL_identifier, "The base url used for iteracting with the api", false, true);
+	parser->addOption(downloadURL_identifier, "The base url used to download the files", false, true);
+
 	parser->passArguments(argc, argv);
 
 
@@ -24,7 +27,7 @@ void MangaDex::init(int argc,char* argv[]) {
 		this->outputDir = parser->getArgument(outputDir_identifier);
 	}
 	else {
-		logg->errorLog("Working directory not found setting to the working directory", false);
+		logg->errorLog("Working directory not found ,setting to the working directory", false);
 		this->outputDir = FileHandler::getWorkingDirectory();
 	}
 	if (parser->doesArgExist(mode_identifier)) {
@@ -41,7 +44,20 @@ void MangaDex::init(int argc,char* argv[]) {
 		logg->errorLog("quality option not found setting it to defualt (data)", false);
 		//defualt
 		this->quality = "data";
+	}if (parser->doesArgExist(language_identifier)) {
+		this->desiredLanguage = parser->getArgument(language_identifier);
+	}else {
+		logg->errorLog("Language option not found setting it to defualt (en)",false);
+		this->desiredLanguage = "en";
 	}
+
+	if (parser->doesArgExist(baseURL_identifier)) {
+		baseCli = httplib::Client{parser->getArgument(baseURL_identifier)};
+	}
+	if (parser->doesArgExist(downloadURL_identifier)) {
+		baseDownloadCli = httplib::Client{parser->getArgument(downloadURL_identifier)};
+	}
+
 	logg->whereisLogFile();
 }
 //Sends a get request using the base url
@@ -128,16 +144,12 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 	mangaInfo manga = getMangaMetaData();
 	manga.title = getTitle();
 
-
 	std::string manga_dir = this->outputDir + "\\" + FileHandler::sanitiseFileName(manga.title);
 	const std::string name_prefix = manga.title;
 	const std::string base_DIR{ this->outputDir+"\\"+manga.title};
-	
-	
 
 	FileHandler::checkIfExists(manga_dir,true);
-		
-	
+
 	 //if the mode is not volumes or chapter then it will defualt to manga
 		for (volumeInfo vinfo : manga.vinfos) {
 			
@@ -189,8 +201,9 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 					logg->errorLog("Wrong data setting check -help for details", true);
 				}
 			}
-			compile(base_DIR);
+			
 		}
+		compile(base_DIR);
 	return false;
 }
 //uses varibles provided via cmd instead
@@ -198,16 +211,19 @@ bool MangaDex::writeMangaToDisk() {
 	this->writeMangaToDisk(this->mode,this->quality);
 	return true;
 }
-
+//compresses all the files in a zip to .cbz files which can be read by manga readers
 bool MangaDex::compile(std::string baseDir) {
 	std::vector<std::string> dirs = FileHandler::listAllFoldersInDir(baseDir);
 	logg->log("Compiling downloaded files into cbz archives");
-	//FileHandler::zipAllFilesFromDir(dirs,baseDir);
+
 	for (std::string dir: dirs) {
 		logg->log("Now compiling: " + dir);
 		std::string dirOut = baseDir + "\\" + std::filesystem::path(dir).filename().string();
 		FileHandler::zipAllFilesFromDir(dir,FileHandler::listAllFilesInDir(dir), dirOut);
 		logg->log("Compiled: " + dir + " into: " + dirOut);
+		
+		//directory is no longer needed so can be removed
+		FileHandler::removeDir(dir);
 	}
 	logg->log("Finished Compiling all files!");
 	return true;
@@ -227,27 +243,22 @@ mangaInfo MangaDex::getMangaMetaData() {
 	auto json = parser.iterate(responce);
 	simdjson::ondemand::object volumes_c = json["volumes"].get_object();
 	
-
-	
-
 	for (auto volume : volumes_c) {
 		volumeInfo vinfo;
 		vinfo.title = convertFromViewToString(volume.key_raw_json_token());
 
 		for (auto chapter : json["volumes"][vinfo.title]["chapters"].get_object()) {
 			
-
 			std::string chatperN = convertFromViewToString(chapter.key_raw_json_token());
 			std::string chapterID = convertFromViewToString(json["volumes"][vinfo.title]["chapters"][chatperN]["id"].get_string().value());
 			
 			std::string chapter_responce{};
 			simdjson::ondemand::parser chapter_parser;
 
-
 			bool wasChapterFound = false;
 			//checks if the chapter is in the right language
 			
-				if (isChapterInDesiredLang(chapterID, "en", &chapter_responce)) {
+				if (isChapterInDesiredLang(chapterID, desiredLanguage, &chapter_responce)) {
 					
 					auto chapter_json = chapter_parser.iterate(chapter_responce);
 
@@ -258,7 +269,7 @@ mangaInfo MangaDex::getMangaMetaData() {
 						cinfo.title = convertFromViewToString(chapter_json["data"]["attributes"]["chapter"].get_string().value());
 					}
 					catch (simdjson::simdjson_error e) {
-						logg->errorLog(e.what());
+						logg->errorLog(e.what(),false);
 						logg->log("Title not found setting the title to blank");
 						cinfo.title = "";
 					}
@@ -272,7 +283,7 @@ mangaInfo MangaDex::getMangaMetaData() {
 
 					for (auto id : json["volumes"][vinfo.title]["chapters"][chatperN]["others"].get_array()) {
 						std::string sID = convertFromViewToString(id.get_string().value());
-						if (isChapterInDesiredLang(chapterID, "en", &chapter_responce)) {
+						if (isChapterInDesiredLang(chapterID, desiredLanguage, &chapter_responce)) {
 						
 							auto chapter_json = chapter_parser.iterate(chapter_responce);
 
@@ -283,7 +294,7 @@ mangaInfo MangaDex::getMangaMetaData() {
 								cinfo.title = convertFromViewToString(chapter_json["data"]["attributes"]["chapter"].get_string().value());
 							}
 							catch (simdjson::simdjson_error e) {
-								logg->errorLog(e.what());
+								logg->errorLog(e.what(),false);
 								logg->log("Title not found leaving setting the title to blank");
 								cinfo.title = "";
 							}
@@ -296,12 +307,8 @@ mangaInfo MangaDex::getMangaMetaData() {
 					if (!wasChapterFound) {
 						logg->log("Unable to find the relevant chapter for the lang requested skipping...");
 					}
-
-				}
-			
+				}	
 		}
-		
-		
 		//chapters are in reverse order unreverse them
 		std::reverse(vinfo.chapters.begin(),vinfo.chapters.end());
 		volumes.push_back(vinfo);
@@ -309,17 +316,15 @@ mangaInfo MangaDex::getMangaMetaData() {
 	//volumes are in reverse order unreverse them
 	std::reverse(volumes.begin(), volumes.end());
 	mngInfo.vinfos = volumes;
-
-	
-
 	return mngInfo;
 }
+
 std::string MangaDex::convertFromViewToString(std::string_view value) {
 	std::string temp{ value };
 	temp.erase(std::remove(temp.begin(), temp.end(), '"'), temp.end());
 	return temp;
 }
-
+//gets all the files in a chapter
 void MangaDex::getFilesInChapter(chapterInfo* cinfo,std::string chapterID) {
 	std::string responce = sendRequestUsingBASEURL(this->BASEURL_CHAPTER_IMAGES+chapterID);
 	simdjson::ondemand::parser parser;

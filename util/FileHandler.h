@@ -15,9 +15,13 @@
  class FileHandler
 {
 public:
-	static std::stringstream getFileContents_stream();
-	static std::string getFileContents();
+	static void removeDir(std::string path) {
+		std::filesystem::remove_all(path);
+	}
 
+	static void removeFile(std::string filepath) {
+		std::filesystem::remove(filepath);
+	}
 	
 	//For now just gets the temp directory
 	static std::string getWorkingDirectory() {
@@ -127,6 +131,12 @@ public:
 
 		int err = 0;
 		outputPath += ".cbz";
+
+		//If it already exists remove it
+		if (checkIfExists(outputPath, false)) {
+			removeFile(outputPath);
+		}
+
 		zip_t* archive = zip_open(outputPath.c_str(), ZIP_CREATE , &err);
 		if (archive == nullptr) {
 			zip_error_t ziperror;
@@ -161,4 +171,5 @@ public:
 			return;
 		}
 	}
+	
 };

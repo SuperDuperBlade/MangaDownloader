@@ -11,6 +11,7 @@ Downlods a manga from mangadex using their api
  
  -dt : quality of the files being used , options are data (fullquality which is the defualt) or datasaver (reduced quality saving space)
 
+ The rest can be viewed using -help
 # Libarires used
 
     libzip is not included in the src of this project when compiling from src you will have to link it yourself.

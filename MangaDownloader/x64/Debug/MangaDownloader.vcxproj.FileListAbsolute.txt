@@ -1,3 +1,6 @@
 A:\cpp\projects\MangaDownloader\x64\Debug\libcrypto-3-x64.dll
 A:\cpp\projects\MangaDownloader\x64\Debug\libssl-3-x64.dll
 A:\cpp\projects\MangaDownloader\MangaDownloader\x64\Debug\MangaDow.72CC582D.Up2Date
+A:\cpp\projects\MangaDownloader\x64\Debug\zip.dll
+A:\cpp\projects\MangaDownloader\x64\Debug\bz2d.dll
+A:\cpp\projects\MangaDownloader\x64\Debug\zlibd1.dll

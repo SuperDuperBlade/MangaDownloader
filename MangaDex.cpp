@@ -106,12 +106,10 @@ std::string MangaDex::sendRequestUsingBASEDOWNLOAD_URL(std::string addonURL) {
 	return res->body;
 }
 
-
+//downloads the images from mangaDex and converts them to cbz files
 bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 
-	logg->log(mode);
 	
-
 	if (!FileHandler::checkIfExists(this->outputDir, true)) {
 		logg->log("Dir:" + this->outputDir + " ,not found attempting to create");
 	}
@@ -124,24 +122,23 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 	const std::string name_prefix = manga.title;
 	const std::string base_DIR{ this->outputDir+"\\"+manga.title};
 	
-	FileHandler::checkIfExists(manga_dir,true);
+	compile(base_DIR);
 
+	FileHandler::checkIfExists(manga_dir,true);
+		
 	
 	 //if the mode is not volumes or chapter then it will defualt to manga
 		for (volumeInfo vinfo : manga.vinfos) {
 			
 			//all the files in a specific volume go to the corrasponding directory
-			if(mode == "volumes") manga_dir = base_DIR+"\\" +"v" + vinfo.title + "_" + name_prefix;
+			if(mode == "volume") manga_dir = base_DIR+"\\" +"v" + vinfo.title + "_" + name_prefix;
 			
-			FileHandler::checkIfExists(manga_dir,true);
+			FileHandler::mkdir(manga_dir);
 			long chapterCounter{ 0 };
 			long fileCounter{ 0 };
 
-			
-
 			for (chapterInfo cinfo: vinfo.chapters) {
 				chapterCounter++;
-
 
 				std::string chapterHash = cinfo.hash;
 				//if chapter is empty then it will be set to its index
@@ -150,24 +147,26 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 				}
 				//all the files in a chapter go to a corrasponding directory
 				if (mode == "chapter") manga_dir = base_DIR+"\\"+"v" + vinfo.title+"_" + "c" + cinfo.title + "_" + name_prefix;
-				
 
 				//Creates the dir in advance
 				FileHandler::mkdir(manga_dir);
 
-				if (data_setting == "data" || data_setting == "both") {
+				if (data_setting == "data" ) {
+					
 					for (std::string file : cinfo.fileNames_data) {
+						
 						//retrives file and writes to directory
-						std::string filepath = manga_dir + "\\data\\" + std::to_string(fileCounter)+"_"+file;
+						std::string filepath = manga_dir+ "\\" + std::to_string(fileCounter) + "_" + file;
 						std::string addonURL = this->FILEDOWNLOAD_URL_DATA+chapterHash + "/"+file;
 						std::string responce = sendRequestUsingBASEDOWNLOAD_URL(addonURL);
 						FileHandler::createImageFile(filepath, responce);
 						fileCounter++;
 					}
-				}else if (data_setting == "saver" || data_setting == "both") {
+				}else if (data_setting == "saver") {
+					
 					for (std::string file : cinfo.fileNames_datasaver) {
 						//retrives file and writes to directory
-						std::string filepath = manga_dir + "\\data_saver\\" + std::to_string(fileCounter) + "_" + file;
+						std::string filepath = manga_dir + "\\" + std::to_string(fileCounter) + "_" + file;
 						std::string addonURL = this->FILEDOWNLOAD_URL_DATA + chapterHash + "/" + file;
 						std::string responce = sendRequestUsingBASEDOWNLOAD_URL(addonURL);
 						FileHandler::createImageFile(filepath, responce);
@@ -178,12 +177,8 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 					//No data setting found exiting
 					logg->errorLog("Wrong data setting check -help for details", true);
 				}
-
-				//reset the manga_dir directory for the next chapter
-				
-
 			}
-			
+			compile(base_DIR);
 		}
 	return false;
 }
@@ -193,6 +188,18 @@ bool MangaDex::writeMangaToDisk() {
 	return true;
 }
 
+bool MangaDex::compile(std::string baseDir) {
+	std::vector<std::string> dirs = FileHandler::listAllFoldersInDir(baseDir);
+	logg->log("Compiling downloaded files into cbz archives");
+	for (std::string dir: dirs) {
+		logg->log("Now compiling: " + dir);
+		std::string dirOut = baseDir + "\\" + std::filesystem::path(dir).filename().string();
+		FileHandler::zipAllFilesFromDir(FileHandler::listAllFilesInDir(dir), dirOut);
+		logg->log("Compiled: " + dir + " into: " + dirOut);
+	}
+	logg->log("Finished Compiling all files!");
+	return true;
+}
 
 //gets the correct chapters sorts them into their respective volumes and gets the files for the respective chapters needed for parsing
 mangaInfo MangaDex::getMangaMetaData() {
@@ -282,9 +289,7 @@ mangaInfo MangaDex::getMangaMetaData() {
 			
 		}
 		
-		for (volumeInfo vol : volumes) {
-			logg->log(vol.chapters.size() + "a");
-		}
+		
 		//chapters are in reverse order unreverse them
 		std::reverse(vinfo.chapters.begin(),vinfo.chapters.end());
 		volumes.push_back(vinfo);
@@ -312,7 +317,6 @@ void MangaDex::getFilesInChapter(chapterInfo* cinfo,std::string chapterID) {
 	for (auto obj : json["chapter"]["data"].get_array()) {
 		std::string filename = convertFromViewToString(obj.get_string().value());
 		cinfo->fileNames_data.push_back(filename);
-		logg->log(filename);
 	}
 	for (auto obj : json["chapter"]["dataSaver"].get_array()) {
 		std::string filename = convertFromViewToString(obj.get_string().value());

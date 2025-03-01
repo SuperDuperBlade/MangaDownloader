@@ -54,14 +54,16 @@ class MangaDex
 		
 		bool writeMangaToDisk( std::string mode, std::string data_setting);
 		bool writeMangaToDisk();
+
+		bool compile(std::string baseDir);
 		mangaInfo getMangaMetaData();
 		std::string convertFromViewToString(std::string_view value);
 		void getFilesInChapter(chapterInfo* cinfo,std::string chapterID);
-		bool isChapterInDesiredLang(std::string chapterID, std::string lang);
+
 
 		bool isChapterInDesiredLang(std::string chapterID, std::string lang, std::string* responce);
 
-		std::string getFirstValueFromJson(simdjson::ondemand::array object);
+
 
 	
 		void init();

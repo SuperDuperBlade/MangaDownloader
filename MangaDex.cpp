@@ -122,7 +122,7 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 	const std::string name_prefix = manga.title;
 	const std::string base_DIR{ this->outputDir+"\\"+manga.title};
 	
-	compile(base_DIR);
+	
 
 	FileHandler::checkIfExists(manga_dir,true);
 		
@@ -191,10 +191,11 @@ bool MangaDex::writeMangaToDisk() {
 bool MangaDex::compile(std::string baseDir) {
 	std::vector<std::string> dirs = FileHandler::listAllFoldersInDir(baseDir);
 	logg->log("Compiling downloaded files into cbz archives");
+	//FileHandler::zipAllFilesFromDir(dirs,baseDir);
 	for (std::string dir: dirs) {
 		logg->log("Now compiling: " + dir);
 		std::string dirOut = baseDir + "\\" + std::filesystem::path(dir).filename().string();
-		FileHandler::zipAllFilesFromDir(FileHandler::listAllFilesInDir(dir), dirOut);
+		FileHandler::zipAllFilesFromDir(dir,FileHandler::listAllFilesInDir(dir), dirOut);
 		logg->log("Compiled: " + dir + " into: " + dirOut);
 	}
 	logg->log("Finished Compiling all files!");

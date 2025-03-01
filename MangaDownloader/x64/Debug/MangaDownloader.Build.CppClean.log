@@ -7,6 +7,9 @@ a:\cpp\projects\mangadownloader\x64\debug\mangadownloader.exe
 a:\cpp\projects\mangadownloader\x64\debug\mangadownloader.pdb
 a:\cpp\projects\mangadownloader\x64\debug\libcrypto-3-x64.dll
 a:\cpp\projects\mangadownloader\x64\debug\libssl-3-x64.dll
+a:\cpp\projects\mangadownloader\x64\debug\zip.dll
+a:\cpp\projects\mangadownloader\x64\debug\bz2d.dll
+a:\cpp\projects\mangadownloader\x64\debug\zlibd1.dll
 a:\cpp\projects\mangadownloader\mangadownloader\x64\debug\mangadownloader.ilk
 a:\cpp\projects\mangadownloader\mangadownloader\x64\debug\mangadownloader.tlog\cl.command.1.tlog
 a:\cpp\projects\mangadownloader\mangadownloader\x64\debug\mangadownloader.tlog\cl.items.tlog

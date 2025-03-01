@@ -1,5 +1,8 @@
 ﻿  Main.cpp
-A:\cpp\projects\MangaDownloader\Main.cpp(2,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+A:\cpp\projects\MangaDownloader\Main.cpp(3,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+A:\cpp\projects\MangaDownloader\util\FileHandler.h(114,12): warning C4244: 'initializing': conversion from 'std::streamoff' to 'int', possible loss of data
+  (compiling source file 'Main.cpp')
+  
 A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11): warning C4200: nonstandard extension used: zero-sized array in struct/union
   (compiling source file 'Main.cpp')
       A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11):
@@ -12,6 +15,9 @@ A:\cpp\projects\MangaDownloader\libs\cmdParser.h(115,12): warning C4551: functio
   (compiling source file 'Main.cpp')
   
   MangaDex.cpp
+A:\cpp\projects\MangaDownloader\util\FileHandler.h(114,12): warning C4244: 'initializing': conversion from 'std::streamoff' to 'int', possible loss of data
+  (compiling source file 'MangaDex.cpp')
+  
 A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11): warning C4200: nonstandard extension used: zero-sized array in struct/union
   (compiling source file 'MangaDex.cpp')
       A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11):
@@ -23,3 +29,11 @@ A:\cpp\projects\MangaDownloader\libs\cmdParser.h(106,12): warning C4551: functio
 A:\cpp\projects\MangaDownloader\libs\cmdParser.h(115,12): warning C4551: function call missing argument list
   (compiling source file 'MangaDex.cpp')
   
+  Generating code
+  829 of 5742 functions (14.4%) were compiled, the rest were copied from previous compilation.
+    228 functions were new in current compilation
+    511 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  MangaDownloader.vcxproj -> A:\cpp\projects\MangaDownloader\x64\Release\MangaDownloader.exe
+  'pwsh.exe' is not recognized as an internal or external command,
+  operable program or batch file.

@@ -34,7 +34,9 @@ class MangaDex
 {
 	
 	public:
-		MangaDex(CmdParser* parser, Logger* logger);
+		MangaDex(CmdParser* parser, Logger* logger, int argc,char* argv[]);
+
+		void init(int argc, char* argv[]);
 
 	//	MangaDex();
 	//	std::string getMangaInfo(std::string);
@@ -94,6 +96,10 @@ class MangaDex
 		httplib::Client baseCli{ BASEURL };
 		httplib::Client baseDownloadCli{BASEDOWNLOAD_URL};
 
-		
+
+		const std::string mangaID_identifier = "-i";
+		const std::string outputDir_identifier = "-o";
+		const std::string mode_identifier = "-m";
+		const std::string quality_identifier = "-dt";
 };
 

@@ -1,31 +1,42 @@
 #include "MangaDex.h"
 
-MangaDex::MangaDex(CmdParser* parser, Logger* logger) {
+MangaDex::MangaDex(CmdParser* parser, Logger* logger,int argc,char* argv[]) {
 	
 	this->parser = parser;
 	this->logg = logger;
-	this->init();
+	this->init(argc, argv);
 }
 
-void MangaDex::init() {
-	this->mangaID = parser->getArgument("-i");
-	if (parser->doesArgExist("-o")) {
-		this->outputDir = parser->getArgument("-o");
+void MangaDex::init(int argc,char* argv[]) {
+
+
+
+	parser->addOption(mangaID_identifier, "The id of the manga you want to download from mangaDex", true, true);
+	parser->addOption(outputDir_identifier, "The directory you want to write the manga to (defualt is the dir the script is running in)", false, true);
+	parser->addOption(mode_identifier, "The mode you want to download the manga in can be either volumes , chapters or manga.", false, true);
+	parser->addOption(quality_identifier, "The quality of the downloaded images , lower quality will take up less space. options: data , datasaver, both", false, true);
+	parser->passArguments(argc, argv);
+
+
+
+	this->mangaID = parser->getArgument(mangaID_identifier);
+	if (parser->doesArgExist(outputDir_identifier)) {
+		this->outputDir = parser->getArgument(outputDir_identifier);
 	}
 	else {
 		logg->errorLog("Working directory not found setting to the working directory", false);
 		this->outputDir = FileHandler::getWorkingDirectory();
 	}
-	if (parser->doesArgExist("-m")) {
-		this->mode = parser->getArgument("-m");
+	if (parser->doesArgExist(mode_identifier)) {
+		this->mode = parser->getArgument(mode_identifier);
 	}
 	else {
 		//defualt
 		logg->errorLog("mode not set setting it to defualt (volumes)", false);
 		this->mode = "volumes";
 	}
-	if (parser->doesArgExist("-dt")) {
-		this->quality = parser->getArgument("-dt");
+	if (parser->doesArgExist(quality_identifier)) {
+		this->quality = parser->getArgument(quality_identifier);
 	}else {
 		logg->errorLog("quality option not found setting it to defualt (data)", false);
 		//defualt

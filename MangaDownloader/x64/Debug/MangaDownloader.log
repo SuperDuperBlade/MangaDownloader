@@ -18,6 +18,76 @@ A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:         with
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:         [
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:             T=int64_t
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:         ]
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,61): error C2676: binary '+': 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' does not define this operator or a conversion to a type acceptable to the predefined operator
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3214,62):
+      could be 'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(std::basic_string<_Elem,_Traits,_Alloc> &&,const _Elem)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(std::basic_string<_Elem,_Traits,_Alloc> &&,const _Elem)': template parameter '_Elem' is ambiguous
+              A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+              could be 'long'
+              A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+              or       'char'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(std::basic_string<_Elem,_Traits,_Alloc> &&,const _Elem)': could not deduce template argument for 'const _Elem' from 'long'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3208,62):
+      or       'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(std::basic_string<_Elem,_Traits,_Alloc> &&,const _Elem *const )'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(std::basic_string<_Elem,_Traits,_Alloc> &&,const _Elem *const )': could not deduce template argument for 'const _Elem *const ' from 'long'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3202,62):
+      or       'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const _Elem,std::basic_string<_Elem,_Traits,_Alloc> &&)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const _Elem,std::basic_string<_Elem,_Traits,_Alloc> &&)': could not deduce template argument for 'std::basic_string<_Elem,_Traits,_Alloc> &&' from 'long'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3196,62):
+      or       'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const _Elem *const ,std::basic_string<_Elem,_Traits,_Alloc> &&)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const _Elem *const ,std::basic_string<_Elem,_Traits,_Alloc> &&)': could not deduce template argument for 'const _Elem *const ' from 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3183,62):
+      or       'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(std::basic_string<_Elem,_Traits,_Alloc> &&,std::basic_string<_Elem,_Traits,_Alloc> &&)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(std::basic_string<_Elem,_Traits,_Alloc> &&,std::basic_string<_Elem,_Traits,_Alloc> &&)': could not deduce template argument for 'std::basic_string<_Elem,_Traits,_Alloc> &&' from 'long'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3177,62):
+      or       'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(std::basic_string<_Elem,_Traits,_Alloc> &&,const std::basic_string<_Elem,_Traits,_Alloc> &)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(std::basic_string<_Elem,_Traits,_Alloc> &&,const std::basic_string<_Elem,_Traits,_Alloc> &)': could not deduce template argument for 'const std::basic_string<_Elem,_Traits,_Alloc> &' from 'long'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3171,62):
+      or       'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const std::basic_string<_Elem,_Traits,_Alloc> &,std::basic_string<_Elem,_Traits,_Alloc> &&)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const std::basic_string<_Elem,_Traits,_Alloc> &,std::basic_string<_Elem,_Traits,_Alloc> &&)': could not deduce template argument for 'std::basic_string<_Elem,_Traits,_Alloc> &&' from 'long'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3160,62):
+      or       'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const std::basic_string<_Elem,_Traits,_Alloc> &,const _Elem)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const std::basic_string<_Elem,_Traits,_Alloc> &,const _Elem)': template parameter '_Elem' is ambiguous
+              A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+              could be 'long'
+              A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+              or       'char'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const std::basic_string<_Elem,_Traits,_Alloc> &,const _Elem)': could not deduce template argument for 'const _Elem' from 'long'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3147,62):
+      or       'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const std::basic_string<_Elem,_Traits,_Alloc> &,const _Elem *const )'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const std::basic_string<_Elem,_Traits,_Alloc> &,const _Elem *const )': could not deduce template argument for 'const _Elem *const ' from 'long'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3136,62):
+      or       'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const _Elem,const std::basic_string<_Elem,_Traits,_Alloc> &)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const _Elem,const std::basic_string<_Elem,_Traits,_Alloc> &)': could not deduce template argument for 'const std::basic_string<_Elem,_Traits,_Alloc> &' from 'long'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3123,62):
+      or       'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const _Elem *const ,const std::basic_string<_Elem,_Traits,_Alloc> &)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const _Elem *const ,const std::basic_string<_Elem,_Traits,_Alloc> &)': could not deduce template argument for 'const _Elem *const ' from 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xstring(3111,62):
+      or       'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const std::basic_string<_Elem,_Traits,_Alloc> &,const std::basic_string<_Elem,_Traits,_Alloc> &)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::basic_string<_Elem,_Traits,_Alloc> std::operator +(const std::basic_string<_Elem,_Traits,_Alloc> &,const std::basic_string<_Elem,_Traits,_Alloc> &)': could not deduce template argument for 'const std::basic_string<_Elem,_Traits,_Alloc> &' from 'long'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xutility(4551,46):
+      or       'std::move_iterator<_Iter> std::operator +(move_iterator<_Iter>::difference_type,const std::move_iterator<_Iter> &) noexcept(<expr>)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::move_iterator<_Iter> std::operator +(move_iterator<_Iter>::difference_type,const std::move_iterator<_Iter> &) noexcept(<expr>)': could not deduce template argument for 'const std::move_iterator<_Iter> &' from 'long'
+      C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.43.34808\include\xutility(2014,50):
+      or       'std::reverse_iterator<_BidIt> std::operator +(reverse_iterator<_BidIt>::difference_type,const std::reverse_iterator<_BidIt> &) noexcept(<expr>)'
+          A:\cpp\projects\MangaDownloader\MangaDex.cpp(204,55):
+          'std::reverse_iterator<_BidIt> std::operator +(reverse_iterator<_BidIt>::difference_type,const std::reverse_iterator<_BidIt> &) noexcept(<expr>)': could not deduce template argument for 'const std::reverse_iterator<_BidIt> &' from 'long'
+  
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(279,13): warning C4244: 'initializing': conversion from 'T' to 'long', possible loss of data
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(279,13): warning C4244:         with
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(279,13): warning C4244:         [
@@ -29,6 +99,3 @@ A:\cpp\projects\MangaDownloader\MangaDex.cpp(343,13): warning C4244:         wit
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(343,13): warning C4244:         [
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(343,13): warning C4244:             T=int64_t
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(343,13): warning C4244:         ]
-  MangaDownloader.vcxproj -> A:\cpp\projects\MangaDownloader\x64\Debug\MangaDownloader.exe
-  'pwsh.exe' is not recognized as an internal or external command,
-  operable program or batch file.

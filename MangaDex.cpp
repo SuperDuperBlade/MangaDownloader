@@ -201,7 +201,7 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 				//all the files in a chapter go to a corrasponding directory
 				if (mode == "chapter") {
 					if (method == 0)manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + "c" + cinfo.title + "_" + name_prefix;
-					else if (method == 1)manga_dir = base_DIR + "\\" + "v" + cinfo.volume + "_" + "c" + cinfo.chapter + "_" + FileHandler::sanitiseFileName(cinfo.title);
+					else if (method == 1)manga_dir = base_DIR + "\\" + "v" + volumeCounter + "_" + "c" + cinfo.chapter + "_" + FileHandler::sanitiseFileName(cinfo.title);
 				}
 
 				//Creates the dir in advance

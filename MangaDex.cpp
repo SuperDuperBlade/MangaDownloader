@@ -175,7 +175,7 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 
 	FileHandler::checkIfExists(manga_dir,true);
 
-	long counter{ 0 };
+	long volumeCounter{ 1 };
 	 //if the mode is not volumes or chapter then it will defualt to manga
 		for (volumeInfo vinfo : manga.vinfos) {
 			
@@ -184,15 +184,14 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 
 				//yes i know they are the same
 				if (method == 0) manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + name_prefix;
-				else if (method == 1) manga_dir = base_DIR + "\\" + "v" + std::to_string(counter) + "_" + name_prefix;
+				else if (method == 1) manga_dir = base_DIR + "\\" + "v" + std::to_string(volumeCounter) + "_" + name_prefix;
 			}
 
 			FileHandler::mkdir(manga_dir);
-			long chapterCounter{ 0 };
+			long chapterCounter{ 1 };
 			long fileCounter{ 0 };
 
 			for (chapterInfo cinfo: vinfo.chapters) {
-				chapterCounter++;
 
 				std::string chapterHash = cinfo.hash;
 				//if chapter is empty then it will be set to its index
@@ -234,8 +233,9 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 					//No data setting found exiting
 					logg->errorLog("Wrong data setting check -help for details", true);
 				}
+				chapterCounter++;
 			}
-			counter++;
+			volumeCounter++;
 		}
 		compile(base_DIR);
 	return false;

@@ -185,12 +185,15 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 				//yes i know they are the same
 				if (method == 0) manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + name_prefix;
 				else if (method == 1) manga_dir = base_DIR + "\\" + "v" + std::to_string(volumeCounter) + "_" + name_prefix;
+				FileHandler::mkdir(manga_dir);
 			}
 
-			FileHandler::mkdir(manga_dir);
+			
 			long chapterCounter{ 1 };
 			long fileCounter{ 0 };
 			
+			bool temp = true;
+
 			for (chapterInfo cinfo: vinfo.chapters) {
 
 				std::string chapterHash = cinfo.hash;
@@ -202,11 +205,13 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 				if (mode == "chapter") {
 					if (method == 0)manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + "c" + cinfo.title + "_" + name_prefix;
 					else if (method == 1)manga_dir = base_DIR + "\\" + "v" + std::to_string(volumeCounter) + "_" + "c" + cinfo.chapter + "_" + FileHandler::sanitiseFileName(cinfo.title);
+					if (temp) {
+						//Creates the dir in advance
+						FileHandler::mkdir(manga_dir);
+						temp == false;
+					}
 				}
-
-				//Creates the dir in advance
-				FileHandler::mkdir(manga_dir);
-
+			
 				if (data_setting == "data" ) {
 					
 					for (std::string file : cinfo.fileNames_data) {
@@ -237,7 +242,7 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 			}
 			volumeCounter++;
 		}
-		compile(base_DIR);
+	compile(base_DIR);
 	return false;
 }
 //uses varibles provided via cmd instead
@@ -316,7 +321,7 @@ mangaInfo MangaDex::getMangaMetaDataSecondMethod() {
 		else {
 			mngInfo.vinfos.push_back(vinfo);
 
-			currentVolIter == stoi(cinfo.volume);
+			currentVolIter +=1;
 			vinfo.chapters.clear();
 			vinfo.title = std::to_string(currentVolIter);
 		}

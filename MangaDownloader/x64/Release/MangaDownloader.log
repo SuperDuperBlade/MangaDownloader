@@ -1,20 +1,4 @@
-﻿  Main.cpp
-A:\cpp\projects\MangaDownloader\Main.cpp(3,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
-A:\cpp\projects\MangaDownloader\util\FileHandler.h(118,12): warning C4244: 'initializing': conversion from 'std::streamoff' to 'int', possible loss of data
-  (compiling source file 'Main.cpp')
-  
-A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11): warning C4200: nonstandard extension used: zero-sized array in struct/union
-  (compiling source file 'Main.cpp')
-      A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11):
-      This member will be ignored by a defaulted constructor or copy/move assignment operator
-  
-A:\cpp\projects\MangaDownloader\libs\cmdParser.h(106,12): warning C4551: function call missing argument list
-  (compiling source file 'Main.cpp')
-  
-A:\cpp\projects\MangaDownloader\libs\cmdParser.h(115,12): warning C4551: function call missing argument list
-  (compiling source file 'Main.cpp')
-  
-  MangaDex.cpp
+﻿  MangaDex.cpp
 A:\cpp\projects\MangaDownloader\util\FileHandler.h(118,12): warning C4244: 'initializing': conversion from 'std::streamoff' to 'int', possible loss of data
   (compiling source file 'MangaDex.cpp')
   
@@ -34,21 +18,21 @@ A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:         with
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:         [
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:             T=int64_t
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:         ]
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(279,13): warning C4244: 'initializing': conversion from 'T' to 'long', possible loss of data
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(279,13): warning C4244:         with
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(279,13): warning C4244:         [
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(279,13): warning C4244:             T=int64_t
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(279,13): warning C4244:         ]
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(319,19): warning C4553: '==': result of expression not used; did you intend '='?
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(343,13): warning C4244: 'initializing': conversion from 'T' to 'long', possible loss of data
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(343,13): warning C4244:         with
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(343,13): warning C4244:         [
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(343,13): warning C4244:             T=int64_t
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(343,13): warning C4244:         ]
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(211,12): warning C4553: '==': result of expression not used; did you intend '='?
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(284,13): warning C4244: 'initializing': conversion from 'T' to 'long', possible loss of data
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(284,13): warning C4244:         with
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(284,13): warning C4244:         [
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(284,13): warning C4244:             T=int64_t
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(284,13): warning C4244:         ]
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(348,13): warning C4244: 'initializing': conversion from 'T' to 'long', possible loss of data
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(348,13): warning C4244:         with
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(348,13): warning C4244:         [
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(348,13): warning C4244:             T=int64_t
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(348,13): warning C4244:         ]
   Generating code
-  228 of 5810 functions ( 3.9%) were compiled, the rest were copied from previous compilation.
-    54 functions were new in current compilation
-    336 functions had inline decision re-evaluated but remain unchanged
+  7 of 5810 functions ( 0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    114 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   MangaDownloader.vcxproj -> A:\cpp\projects\MangaDownloader\x64\Release\MangaDownloader.exe
   'pwsh.exe' is not recognized as an internal or external command,

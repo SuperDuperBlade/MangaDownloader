@@ -19,6 +19,8 @@ struct chapterInfo {
 	std::string id;
 	std::string title;
 	std::string hash;
+	std::string volume;
+	std::string chapter;
 	std::vector<std::string> fileNames_data;
 	std::vector<std::string> fileNames_datasaver;
 };
@@ -51,6 +53,7 @@ class MangaDex
 		bool writeMangaToDisk();
 
 		bool compile(std::string baseDir);
+		mangaInfo getMangaMetaDataSecondMethod();
 		mangaInfo getMangaMetaData();
 		std::string convertFromViewToString(std::string_view value);
 		void getFilesInChapter(chapterInfo* cinfo,std::string chapterID);
@@ -58,12 +61,15 @@ class MangaDex
 
 		bool isChapterInDesiredLang(std::string chapterID, std::string lang, std::string* responce);
 
+		static bool isChapterLargerThanTheOther(chapterInfo const& cinfo1, chapterInfo const& cinfo2);
+
 		//bool writeMangaToDisk(std::string mode);
 		std::string sendRequestUsingBASEURL(std::string addonURL);
 		
 	private: 
 		std::string mangaID{}, outputDir{}, mode{}, quality{}, desiredLanguage{};
 		int rateLimit = 20; //defualt
+		int method = 1; //defualt
 		Logger* logg;
 		CmdParser* parser;
 
@@ -90,5 +96,6 @@ class MangaDex
 		const std::string language_identifier = "-l";
 		const std::string baseURL_identifier = "-burl";
 		const std::string downloadURL_identifier = "-durl";
+		const std::string retrivalMethod_identifier = "-gm";
 };
 

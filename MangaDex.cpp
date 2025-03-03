@@ -205,13 +205,11 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 				}
 				//all the files in a chapter go to a corrasponding directory
 				if (mode == "chapter") {
-					if (method == 0)manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + "c" + cinfo.title + "_" + name_prefix;
-					else if (method == 1)manga_dir = base_DIR + "\\" + "v" + std::to_string(volumeCounter) + "_" + "c" + cinfo.chapter + "_" + FileHandler::sanitiseFileName(cinfo.title);
-					if (temp) {
+					if (method == 0) manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + "c" + cinfo.title + "_" + name_prefix;
+					else if (method == 1) manga_dir = base_DIR + "\\" + "v" + std::to_string(volumeCounter) + "c" + cinfo.chapter + "_" + FileHandler::sanitiseFileName(cinfo.title);
+
 						//Creates the dir in advance
 						FileHandler::mkdir(manga_dir);
-						temp == false;
-					}
 				}
 			
 				if (data_setting == "data" ) {
@@ -244,7 +242,7 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 			}
 			volumeCounter++;
 		}
-	compile(base_DIR);
+	//compile(base_DIR);
 	return false;
 }
 //uses varibles provided via cmd instead

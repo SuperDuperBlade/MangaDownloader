@@ -12,7 +12,7 @@ class Logger {
 private:
 	bool exitOnFailure;
 	const std::string defualtErrorMessage{ "Encountred a error: " };
-	std::string errorMessage = defualtErrorMessage;
+	std::string errorMessage{defualtErrorMessage};
 	std::string logFilePath = FileHandler::getWorkingDirectory() + "\\log.txt";
 public:
 	

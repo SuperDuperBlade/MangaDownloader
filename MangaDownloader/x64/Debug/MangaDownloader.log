@@ -18,12 +18,11 @@ A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:         with
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:         [
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:             T=int64_t
 A:\cpp\projects\MangaDownloader\MangaDex.cpp(80,15): warning C4244:         ]
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(213,12): warning C4553: '==': result of expression not used; did you intend '='?
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(286,13): warning C4244: 'initializing': conversion from 'T' to 'long', possible loss of data
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(286,13): warning C4244:         with
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(286,13): warning C4244:         [
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(286,13): warning C4244:             T=int64_t
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(286,13): warning C4244:         ]
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(284,13): warning C4244: 'initializing': conversion from 'T' to 'long', possible loss of data
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(284,13): warning C4244:         with
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(284,13): warning C4244:         [
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(284,13): warning C4244:             T=int64_t
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(284,13): warning C4244:         ]
   MangaDownloader.vcxproj -> A:\cpp\projects\MangaDownloader\x64\Debug\MangaDownloader.exe
   'pwsh.exe' is not recognized as an internal or external command,
   operable program or batch file.

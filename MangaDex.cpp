@@ -62,7 +62,7 @@ void MangaDex::init(int argc,char* argv[]) {
 	}
 	
 	if (parser->doesArgExist(dontCompile_identifier)) {
-		method = std::stoi(parser->getArgument(dontCompile_identifier));
+		dontCompile = true;
 	}
 
 	logg->whereisLogFile();

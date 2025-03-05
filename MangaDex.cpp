@@ -19,34 +19,61 @@ void MangaDex::init(int argc,char* argv[]) {
 	parser->addOption(downloadURL_identifier, "The base url used to download the files", false, true);
 	parser->addOption(retrivalMethod_identifier, "The retrival method to use to get the files", false, true);
 	parser->addOption(dontCompile_identifier, "Does not compile the images into a cbz file", false, false);
-
+	
+	//The executable itself does not count
+	bool notEnoughArgs = parser->getNumberOfRequiredArguments() > argc - 1;
+	
 	parser->passArguments(argc, argv);
+	if(notEnoughArgs) logg->log(" Entering promt mode.., ");
+	
+	if(!notEnoughArgs) this->mangaID = parser->getArgument(mangaID_identifier);
+	else {
+		std::cout << "Enter your ID: ";
+		std::cin >> this->mangaID;
+	}
 
-	this->mangaID = parser->getArgument(mangaID_identifier);
 	if (parser->doesArgExist(outputDir_identifier)) {
 		this->outputDir = parser->getArgument(outputDir_identifier);
 	}
-	else {
+	else if (notEnoughArgs) {
+		std::cout << "Enter the output Dir: ";
+		std::cin >> this->outputDir;
+	}else {
 		logg->errorLog("Working directory not found ,setting to the working directory", false);
 		this->outputDir = FileHandler::getWorkingDirectory();
 	}
+
 	if (parser->doesArgExist(mode_identifier)) {
 		this->mode = parser->getArgument(mode_identifier);
 	}
-	else {
+	else if (notEnoughArgs) {
+		std::cout << "Enter the mode: ";
+		std::cin >> this->mode;
+	}else {
 		//defualt
 		logg->errorLog("mode not set setting it to defualt (volumes)", false);
 		this->mode = "volumes";
 	}
+
 	if (parser->doesArgExist(quality_identifier)) {
 		this->quality = parser->getArgument(quality_identifier);
+	}
+	else if (notEnoughArgs) {
+		std::cout << "Enter the quality you want: ";
+		std::cin >> this->quality;
 	}else {
 		logg->errorLog("quality option not found setting it to defualt (data)", false);
 		//defualt
 		this->quality = "data";
-	}if (parser->doesArgExist(language_identifier)) {
+	}
+	
+	if (parser->doesArgExist(language_identifier)) {
 		this->desiredLanguage = parser->getArgument(language_identifier);
-	}else {
+	}else if(notEnoughArgs){
+		std::cout << "Enter the language you want (shorthand): ";
+		std::cin >> this->desiredLanguage;
+	}
+	else {
 		logg->errorLog("Language option not found setting it to defualt (en)",false);
 		this->desiredLanguage = "en";
 	}
@@ -54,15 +81,50 @@ void MangaDex::init(int argc,char* argv[]) {
 	if (parser->doesArgExist(baseURL_identifier)) {
 		baseCli = httplib::Client{parser->getArgument(baseURL_identifier)};
 	}
+	else if (notEnoughArgs) {
+		std::cout << "Enter the baseUrl (type skip to use defualt): ";
+		std::string baseURL_t;
+		std::cin >> baseURL_t;
+		if (baseURL_t != "skip" && baseURL_t != "SKIP") {
+			baseCli = httplib::Client{ baseURL_t };
+		}
+	}
+
 	if (parser->doesArgExist(downloadURL_identifier)) {
 		baseDownloadCli = httplib::Client{parser->getArgument(downloadURL_identifier)};
 	}
+	else if (notEnoughArgs) {
+		std::string baseDownloadUrl_t;
+		std::cout << "Enter the base Download Url (type skip to use defualt): ";
+		std::cin >> baseDownloadUrl_t;
+		if (baseDownloadUrl_t != "skip" && baseDownloadUrl_t != "SKIP") {
+			baseCli = httplib::Client{ baseDownloadUrl_t };
+		}
+	}
+
 	if (parser->doesArgExist(retrivalMethod_identifier)) {
 		method = std::stoi(parser->getArgument(retrivalMethod_identifier));
+	}
+	else if (notEnoughArgs) {
+		std::string result{};
+		
+		std::cout << "Enter the method you would like to choose (options 0 , 1) (1 is perfferred): ";
+		std::cin >> result;
+
+		this->method = std::stoi(result);
 	}
 	
 	if (parser->doesArgExist(dontCompile_identifier)) {
 		dontCompile = true;
+	}else if (notEnoughArgs) {
+		std::string result;
+
+		std::cout << "Should we compile the manga into .cbz files after it is downloaded( 0 / no for no , 1 / yes for yes ): ";
+		std::cin >> result;
+
+		if (result == "0" || result == "no") {
+			dontCompile = true;
+		}
 	}
 
 	logg->whereisLogFile();
@@ -125,33 +187,37 @@ std::string MangaDex::getTitle() {
 }
 //TODO
 std::string MangaDex::getCoverFileName(std::string mangaID) {
+	try {
+		//first finds the cover id
+		std::string responce = sendRequestUsingBASEURL(BASEURL_MANGA + mangaID);
+		simdjson::ondemand::parser parser;
 
-	//first finds the cover id
-	std::string responce = sendRequestUsingBASEURL(BASEURL_MANGA+mangaID);
-	simdjson::ondemand::parser parser;
+		auto json = parser.iterate(responce);
+		auto array = json["data"]["relationships"].get_array();
 
-	auto json = parser.iterate(responce);
-	auto array = json["data"]["relationships"].get_array();
+		for (auto obj : array) {
+			std::string type = convertFromViewToString(obj["type"].get_string().value());
+			if (type == "cover_art") {
+				std::string id = convertFromViewToString(obj["id"].get_string().value());
+				//sends a request to get more info about the coverID so we can get the file name
+				responce = sendRequestUsingBASEURL(BASEURL_COVER + id);
+				json = parser.iterate(responce);
+				std::string fileName = convertFromViewToString(json["data"]["attributes"]["fileName"].get_string().value());
 
-	for (auto obj : array) {
-		std::string type = convertFromViewToString(obj["type"].get_string().value());
-		if (type == "cover_art") {
-			std::string id = convertFromViewToString(obj["id"].get_string().value());
-			//sends a request to get more info about the coverID so we can get the file name
-			responce = sendRequestUsingBASEURL(BASEURL_COVER+id);
-			json = parser.iterate(responce);
-			std::string fileName = convertFromViewToString(json["data"]["attributes"]["filename"].get_string().value());
-			break;
+				return fileName;
+				break;
+			}
 		}
+	}
+	catch (...) {
+		logg->errorLog("Unable to retrive cover skipping...", false);
 	}
 
 
-
-	return "title";
+	return "";
 }
 std::string MangaDex::getCoverFileName() {
-	getCoverFileName(mangaID);
-	return "";
+	return getCoverFileName(mangaID);
 }
 //used for downloading files from the api
 std::string MangaDex::sendRequestUsingBASEDOWNLOAD_URL(std::string addonURL) {
@@ -210,10 +276,11 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 		//Gets the cover of the manga
 		logg->log("Retriving Cover");
 		std::string cover{ getCoverFileName() };
-		std::string filename = "00_cover_"+cover;
-		std::string coverBuffer = sendRequestUsingBASEDOWNLOAD_URL(this->FILEDOWNLOAD_URL_COVER + mangaID + "/" + cover);
-		FileHandler::createImageFile(base_DIR + "\\" + filename, coverBuffer);
-
+		if (cover != "") {
+			std::string filename = "00_cover_" + cover;
+			std::string coverBuffer = sendRequestUsingBASEDOWNLOAD_URL(this->FILEDOWNLOAD_URL_COVER + mangaID + "/" + cover);
+			FileHandler::createImageFile(base_DIR + "\\" + filename, coverBuffer);
+		}
 
 		
 		for (volumeInfo vinfo : manga.vinfos) {

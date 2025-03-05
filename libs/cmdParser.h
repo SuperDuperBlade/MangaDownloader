@@ -103,8 +103,8 @@ public:
 
     void error(){
         cerr << this->getHelpMessage();
-        if(exit){
-            cout << "Exiting \n";
+        if(exit_On_Fail){
+            cout << "Exiting... \n";
             exit(-1);
         }
     }
@@ -112,8 +112,8 @@ public:
     void error(string message){
         cerr <<"Encountered error: "<< message << '\n';
         cerr << this->getHelpMessage();
-        if(exit){
-            cout << "Exiting \n";
+        if(exit_On_Fail){
+            cout << "Exiting... \n";
             exit(-1);
         }
     }

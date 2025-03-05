@@ -1,5 +1,4 @@
-﻿  simdjson.cpp
-  Main.cpp
+﻿  Main.cpp
 A:\cpp\projects\MangaDownloader\Main.cpp(3,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
 A:\cpp\projects\MangaDownloader\util\FileHandler.h(118,12): warning C4244: 'initializing': conversion from 'std::streamoff' to 'int', possible loss of data
   (compiling source file 'Main.cpp')
@@ -8,12 +7,6 @@ A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11): warning C4200: nonstand
   (compiling source file 'Main.cpp')
       A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11):
       This member will be ignored by a defaulted constructor or copy/move assignment operator
-  
-A:\cpp\projects\MangaDownloader\libs\cmdParser.h(106,12): warning C4551: function call missing argument list
-  (compiling source file 'Main.cpp')
-  
-A:\cpp\projects\MangaDownloader\libs\cmdParser.h(115,12): warning C4551: function call missing argument list
-  (compiling source file 'Main.cpp')
   
   MangaDex.cpp
 A:\cpp\projects\MangaDownloader\util\FileHandler.h(118,12): warning C4244: 'initializing': conversion from 'std::streamoff' to 'int', possible loss of data
@@ -24,25 +17,20 @@ A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11): warning C4200: nonstand
       A:\cpp\projects\MangaDownloader\libs\cmdParser.h(28,11):
       This member will be ignored by a defaulted constructor or copy/move assignment operator
   
-A:\cpp\projects\MangaDownloader\libs\cmdParser.h(106,12): warning C4551: function call missing argument list
-  (compiling source file 'MangaDex.cpp')
-  
-A:\cpp\projects\MangaDownloader\libs\cmdParser.h(115,12): warning C4551: function call missing argument list
-  (compiling source file 'MangaDex.cpp')
-  
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(85,15): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(85,15): warning C4244:         with
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(85,15): warning C4244:         [
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(85,15): warning C4244:             T=int64_t
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(85,15): warning C4244:         ]
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(328,13): warning C4244: 'initializing': conversion from 'T' to 'long', possible loss of data
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(328,13): warning C4244:         with
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(328,13): warning C4244:         [
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(328,13): warning C4244:             T=int64_t
-A:\cpp\projects\MangaDownloader\MangaDex.cpp(328,13): warning C4244:         ]
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(147,15): warning C4244: 'initializing': conversion from 'T' to 'int', possible loss of data
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(147,15): warning C4244:         with
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(147,15): warning C4244:         [
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(147,15): warning C4244:             T=int64_t
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(147,15): warning C4244:         ]
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(389,13): warning C4244: 'initializing': conversion from 'T' to 'long', possible loss of data
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(389,13): warning C4244:         with
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(389,13): warning C4244:         [
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(389,13): warning C4244:             T=int64_t
+A:\cpp\projects\MangaDownloader\MangaDex.cpp(389,13): warning C4244:         ]
   Generating code
-  Previous IPDB not found, fall back to full compilation.
-  All 5811 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  21 of 5818 functions ( 0.4%) were compiled, the rest were copied from previous compilation.
+    7 functions were new in current compilation
+    265 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   MangaDownloader.vcxproj -> A:\cpp\projects\MangaDownloader\x64\Release\MangaDownloader.exe
   'pwsh.exe' is not recognized as an internal or external command,

@@ -71,6 +71,10 @@ class MangaDex
 		bool dontCompile = false;
 		int rateLimit = 20; //defualt
 		int method = 1; //defualt
+
+		long rangeMax{}, rangeMin{};
+		bool isRangeEnabled = false;
+		bool isRangeSettingMax = false;
 		Logger* logg;
 		CmdParser* parser;
 
@@ -101,5 +105,6 @@ class MangaDex
 		const std::string downloadURL_identifier = "-durl";
 		const std::string retrivalMethod_identifier = "-gm";
 		const std::string dontCompile_identifier = "-dc";
+		const std::string range_identifier = "-r";
 };
 

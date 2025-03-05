@@ -19,6 +19,7 @@ void MangaDex::init(int argc,char* argv[]) {
 	parser->addOption(downloadURL_identifier, "The base url used to download the files", false, true);
 	parser->addOption(retrivalMethod_identifier, "The retrival method to use to get the files", false, true);
 	parser->addOption(dontCompile_identifier, "Does not compile the images into a cbz file", false, false);
+	parser->addOption(range_identifier, "The range of (chapters/volumes) the method will go through", false, true);
 	
 	//The executable itself does not count
 	bool notEnoughArgs = parser->getNumberOfRequiredArguments() > argc - 1;
@@ -126,6 +127,20 @@ void MangaDex::init(int argc,char* argv[]) {
 			dontCompile = true;
 		}
 	}
+	if (parser->doesArgExist(range_identifier)) {
+		isRangeEnabled = true;
+		std::string value = parser->getArgument(range_identifier);
+		size_t pos = value.find(":");
+		if (pos == std::string::npos) {
+			rangeMin = stol(value);
+		}
+		else {
+			isRangeSettingMax = true;
+			rangeMin = std::stol(value.substr(0, pos));
+			rangeMax = std::stol(value.substr(pos+1,value.size()));
+		}
+	}
+	
 
 	logg->whereisLogFile();
 }
@@ -260,8 +275,6 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 
 	}
 	manga.title = getTitle();
-	
-
 
 	std::string manga_dir = this->outputDir + "\\" + FileHandler::sanitiseFileName(manga.title);
 	const std::string name_prefix = FileHandler::sanitiseFileName(manga.title);
@@ -288,10 +301,21 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 			//all the files in a specific volume go to the corrasponding directory
 			if (mode == "volume") {
 
+				if (volumeCounter < rangeMin) {
+					volumeCounter++;
+					continue;
+				}
+				if (isRangeSettingMax) {
+					if (volumeCounter > rangeMax) {
+						break;
+					}
+				}
+
 				//yes i know they are the same
 				if (method == 0) manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + name_prefix;
 				else if (method == 1) manga_dir = base_DIR + "\\" + "v" + std::to_string(volumeCounter) + "_" + name_prefix;
 				FileHandler::mkdir(manga_dir);
+
 			}
 			
 			long chapterCounter{ 1 };
@@ -310,6 +334,17 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 				}
 				//all the files in a chapter go to a corrasponding directory
 				if (mode == "chapter") {
+
+					if (chapterCounter < rangeMin) {
+						chapterCounter++;
+						continue;
+					}
+					if (isRangeSettingMax) {
+						if (chapterCounter > rangeMax) {
+							break;
+						}
+					}
+
 					if (method == 0) manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + "c" + cinfo.title + "_" + name_prefix;
 					else if (method == 1) manga_dir = base_DIR + "\\" + "v" + std::to_string(volumeCounter) + "c" + cinfo.chapter + "_" + FileHandler::sanitiseFileName(cinfo.title);
 

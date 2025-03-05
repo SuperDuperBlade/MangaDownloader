@@ -68,6 +68,7 @@ class MangaDex
 		
 	private: 
 		std::string mangaID{}, outputDir{}, mode{}, quality{}, desiredLanguage{};
+		bool dontCompile = false;
 		int rateLimit = 20; //defualt
 		int method = 1; //defualt
 		Logger* logg;
@@ -76,11 +77,13 @@ class MangaDex
 		//URLS
 		const std::string BASEURL = "https://api.mangadex.org";
 		const std::string BASEURL_MANGA = "/manga/";
+		const std::string BASEURL_COVER = "/cover/";
 		const std::string BASEURL_CHAPTER = "/chapter/";
 		const std::string BASEURL_CHAPTER_IMAGES = "/at-home/server/";;
 		
 
 		const std::string BASEDOWNLOAD_URL = "https://uploads.mangadex.org";
+		const std::string FILEDOWNLOAD_URL_COVER = "/covers/";
 		const std::string FILEDOWNLOAD_URL_DATA = "/data/";
 		const std::string FILEDOWNLOAD_URL_DATASAVER = "/data-saver/";
 
@@ -97,5 +100,6 @@ class MangaDex
 		const std::string baseURL_identifier = "-burl";
 		const std::string downloadURL_identifier = "-durl";
 		const std::string retrivalMethod_identifier = "-gm";
+		const std::string dontCompile_identifier = "-dc";
 };
 

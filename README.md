@@ -11,6 +11,8 @@ Downlods a manga from mangadex using their api
  
  -dt : quality of the files being used , options are data (fullquality which is the defualt) or datasaver (reduced quality saving space)
 
+ -dc: prevent compiling into .cbz files (leaves just the images in the directory's)
+
  The rest can be viewed using -help
 # Libarires used
 

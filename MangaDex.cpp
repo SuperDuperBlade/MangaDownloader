@@ -18,6 +18,7 @@ void MangaDex::init(int argc,char* argv[]) {
 	parser->addOption(baseURL_identifier, "The base url used for iteracting with the api", false, true);
 	parser->addOption(downloadURL_identifier, "The base url used to download the files", false, true);
 	parser->addOption(retrivalMethod_identifier, "The retrival method to use to get the files", false, true);
+	parser->addOption(dontCompile_identifier, "Does not compile the images into a cbz file", false, false);
 
 	parser->passArguments(argc, argv);
 
@@ -58,6 +59,10 @@ void MangaDex::init(int argc,char* argv[]) {
 	}
 	if (parser->doesArgExist(retrivalMethod_identifier)) {
 		method = std::stoi(parser->getArgument(retrivalMethod_identifier));
+	}
+	
+	if (parser->doesArgExist(dontCompile_identifier)) {
+		method = std::stoi(parser->getArgument(dontCompile_identifier));
 	}
 
 	logg->whereisLogFile();
@@ -121,6 +126,26 @@ std::string MangaDex::getTitle() {
 //TODO
 std::string MangaDex::getCoverFileName(std::string mangaID) {
 
+	//first finds the cover id
+	std::string responce = sendRequestUsingBASEURL(BASEURL_MANGA+mangaID);
+	simdjson::ondemand::parser parser;
+
+	auto json = parser.iterate(responce);
+	auto array = json["data"]["relationships"].get_array();
+
+	for (auto obj : array) {
+		std::string type = convertFromViewToString(obj["type"].get_string().value());
+		if (type == "cover_art") {
+			std::string id = convertFromViewToString(obj["id"].get_string().value());
+			//sends a request to get more info about the coverID so we can get the file name
+			responce = sendRequestUsingBASEURL(BASEURL_COVER+id);
+			json = parser.iterate(responce);
+			std::string fileName = convertFromViewToString(json["data"]["attributes"]["filename"].get_string().value());
+			break;
+		}
+	}
+
+
 
 	return "title";
 }
@@ -148,6 +173,7 @@ std::string MangaDex::sendRequestUsingBASEDOWNLOAD_URL(std::string addonURL) {
 }
 
 //downloads the images from mangaDex and converts them to cbz files
+//if the mode is not volumes or chapter then it will defualt to manga
 bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 
 	
@@ -168,6 +194,8 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 
 	}
 	manga.title = getTitle();
+	
+
 
 	std::string manga_dir = this->outputDir + "\\" + FileHandler::sanitiseFileName(manga.title);
 	const std::string name_prefix = FileHandler::sanitiseFileName(manga.title);
@@ -176,12 +204,20 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 	FileHandler::checkIfExists(manga_dir,true);
 
 	long volumeCounter{ 1 };
-	 //if the mode is not volumes or chapter then it will defualt to manga
-		if (mode == "manga") {
-			manga_dir = base_DIR + "\\" + name_prefix;
-		}
+	long fileCounter{ 0 };
+
+	
+		//Gets the cover of the manga
+		logg->log("Retriving Cover");
+		std::string cover{ getCoverFileName() };
+		std::string filename = "00_cover_"+cover;
+		std::string coverBuffer = sendRequestUsingBASEDOWNLOAD_URL(this->FILEDOWNLOAD_URL_COVER + mangaID + "/" + cover);
+		FileHandler::createImageFile(base_DIR + "\\" + filename, coverBuffer);
+
+
+		
 		for (volumeInfo vinfo : manga.vinfos) {
-			logg->log(std::to_string(volumeCounter));
+	
 			//all the files in a specific volume go to the corrasponding directory
 			if (mode == "volume") {
 
@@ -192,7 +228,9 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 			}
 			
 			long chapterCounter{ 1 };
-			long fileCounter{ 0 };
+			
+			if (mode != "volume") fileCounter = 0;
+
 			
 			bool temp = true;
 
@@ -242,7 +280,7 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 			}
 			volumeCounter++;
 		}
-	//compile(base_DIR);
+		if(!dontCompile) compile(base_DIR);
 	return false;
 }
 //uses varibles provided via cmd instead
@@ -308,27 +346,22 @@ mangaInfo MangaDex::getMangaMetaDataSecondMethod() {
 	std::sort(cinfos.begin(), cinfos.end(), &isChapterLargerThanTheOther);
 
 
-	int currentVolIter = 1;
-	int previousVolIter = 1;
+	int currentVolIter{ 1 };
 	volumeInfo vinfo;
 	for (chapterInfo cinfo : cinfos) {
 		logg->log("Volume: " + cinfo.volume + " , chapter: " + cinfo.chapter);
 
 		if (currentVolIter == stoi(cinfo.volume)) {
 			vinfo.chapters.push_back(cinfo);
-			
 		}
 		else {
 			mngInfo.vinfos.push_back(vinfo);
-
-			previousVolIter = currentVolIter;
 			currentVolIter = currentVolIter+1;
 			vinfo.chapters.clear();
 			vinfo.title = std::to_string(currentVolIter);
 		}
 	}
 	//returns the last volume
-	if(previousVolIter != currentVolIter)
 	mngInfo.vinfos.push_back(vinfo);
 
 	return mngInfo;

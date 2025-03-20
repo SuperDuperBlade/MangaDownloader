@@ -4,7 +4,7 @@
     <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-i ce068526-df38-45b9-899f-a2a672b4442a -o B:\test -m volume -dt data -gm 0 </LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i ce068526-df38-45b9-899f-a2a672b4442a -o B:\test -m manga -dt data -gm 1 </LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

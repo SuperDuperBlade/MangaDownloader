@@ -274,10 +274,12 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 
 	}
 	manga.title = getTitle();
-
-	std::string manga_dir = this->outputDir + "\\" + FileHandler::sanitiseFileName(manga.title);
+	
+	
 	const std::string name_prefix = FileHandler::sanitiseFileName(manga.title);
-	const std::string base_DIR{ this->outputDir + "\\" + FileHandler::sanitiseFileName(manga.title) };
+	std::string manga_dir = this->outputDir + "\\" + name_prefix;
+	const std::string base_DIR{ this->outputDir + "\\" + name_prefix };
+	
 
 	FileHandler::checkIfExists(manga_dir,true);
 
@@ -287,6 +289,12 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 
 	
 	long fileCounter{ 0 };
+
+	//makes it go in another directory if mode is set to manga in order to make the compiler work
+		if (mode == "manga") {
+			manga_dir += +"//" + name_prefix;
+			FileHandler::mkdir(manga_dir);
+		}
 
 	
 		//Gets the cover of the manga
@@ -358,6 +366,9 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 						FileHandler::mkdir(manga_dir);
 				}
 			
+				
+
+
 				if (data_setting == "data" ) {
 					
 					for (std::string file : cinfo.fileNames_data) {

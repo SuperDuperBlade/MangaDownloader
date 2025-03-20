@@ -282,7 +282,11 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 
 	FileHandler::checkIfExists(manga_dir,true);
 
+
 	long volumeCounter{ 1 };
+	if (manga.hasUnorderedVolume) volumeCounter == 0 ;
+
+	
 	long fileCounter{ 0 };
 
 	
@@ -310,6 +314,9 @@ bool MangaDex::writeMangaToDisk( std::string mode,std::string data_setting) {
 						break;
 					}
 				}
+
+				//checks if there are prevolumes (volumes labled 0)
+
 
 				//yes i know they are the same
 				if (method == 0) manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + name_prefix;
@@ -430,10 +437,19 @@ mangaInfo MangaDex::getMangaMetaDataSecondMethod() {
 
 	for (auto chap : json["data"].get_array()) {
 		chapterInfo cinfo;
+		auto volObj = chap["attributes"]["volume"];
+
 
 		cinfo.id = convertFromViewToString(chap["id"].get_string().value());
 		cinfo.title = convertFromViewToString(chap["attributes"]["title"].get_string().value());
-		cinfo.volume = convertFromViewToString(chap["attributes"]["volume"].get_string().value());
+
+		//If the volume attribute is set to null .If so we shall replace it with 0 meaning that the volume is unordered
+		if (!volObj.is_null())	cinfo.volume = convertFromViewToString(volObj.get_string().value());
+		else { 
+			cinfo.volume = "0"; 
+			mngInfo.hasUnorderedVolume = true;
+		}
+		
 		cinfo.chapter = convertFromViewToString(chap["attributes"]["chapter"].get_string().value());
 
 		getFilesInChapter(&cinfo, cinfo.id);
@@ -447,8 +463,8 @@ mangaInfo MangaDex::getMangaMetaDataSecondMethod() {
 	//sorts the chapters in order
 	std::sort(cinfos.begin(), cinfos.end(), &isChapterLargerThanTheOther);
 
-
-	int currentVolIter{ 1 };
+	//volume starts at the volume the first chapter is in
+	int currentVolIter{ std::stoi(cinfos.at(0).volume)};
 	volumeInfo vinfo;
 	for (chapterInfo cinfo : cinfos) {
 		logg->log("Volume: " + cinfo.volume + " , chapter: " + cinfo.chapter);

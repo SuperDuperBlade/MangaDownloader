@@ -27,10 +27,13 @@ struct chapterInfo {
 struct volumeInfo {
 	std::string title;
 	std::vector<chapterInfo> chapters;
+
 };
 struct mangaInfo {
 	std::string title;
 	std::vector<volumeInfo> vinfos;
+	//defualt
+	bool hasUnorderedVolume = false;
 };
 class MangaDex
 {

@@ -12,7 +12,7 @@ void MangaDex::init(int argc,char* argv[]) {
 	//parser configuration
 	parser->addOption(mangaID_identifier, "The id of the manga you want to download from mangaDex", true, true);
 	parser->addOption(outputDir_identifier, "The directory you want to write the manga to (defualt is the dir the script is running in)", false, true);
-	parser->addOption(mode_identifier, "The mode you want to download the manga in can be either volumes , chapters or manga.", false, true);
+	parser->addOption(mode_identifier, "The mode you want to download the manga in can be either volume , chapter or manga.", false, true);
 	parser->addOption(quality_identifier, "The quality of the downloaded images , lower quality will take up less space. options: data , datasaver, both", false, true);
 	parser->addOption(language_identifier, "The language the mangaWill be downlaoded in (shorthand) defualt is en (english) ", false, true);
 	parser->addOption(baseURL_identifier, "The base url used for iteracting with the api", false, true);
@@ -173,7 +173,6 @@ std::string MangaDex::sendRequestUsingBASEURL(std::string addonURL) {
 
 	return res->body;
 }
-
 
 //Gets the title of the manga
 std::string MangaDex::getTitle(std::string mangaID) {

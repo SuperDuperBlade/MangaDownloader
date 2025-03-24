@@ -481,6 +481,9 @@ mangaInfo MangaDex::getMangaMetaDataSecondMethod() {
 	//sorts the chapters in order
 	std::sort(cinfos.begin(), cinfos.end(), &isChapterLargerThanTheOther);
 
+	//checks for duplicates
+	checkForDuplicates(cinfos);
+
 	//volume starts at the volume the first chapter is in
 	int currentVolIter{ std::stoi(cinfos.at(0).volume) };
 	volumeInfo vinfo;
@@ -549,7 +552,7 @@ mangaInfo MangaDex::getMangaMetaData() {
 				cinfo.title = "";
 			}
 			getFilesInChapter(&cinfo, chapterID);
-
+			
 			vinfo.chapters.push_back(cinfo);
 			wasChapterFound = true;
 			//	}
@@ -591,6 +594,9 @@ mangaInfo MangaDex::getMangaMetaData() {
 		}
 		//chapters are in reverse order unreverse them
 		std::reverse(vinfo.chapters.begin(), vinfo.chapters.end());
+
+		//checks if a chapter is a duplicate
+		checkForDuplicates(vinfo.chapters);
 		volumes.push_back(vinfo);
 
 

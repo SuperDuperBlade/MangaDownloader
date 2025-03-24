@@ -2,7 +2,8 @@
 #ifndef _FileHandler
 #define _FileHandler
 
-//#define WIN32_LEAN_AND_MEAN 
+#define WIN32_LEAN_AND_MEAN 
+#define WIN32_LEAN_AND_MEAN 
 
 #include <zip.h>
 #include <iostream>
@@ -11,8 +12,9 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
+#include <algorithm> // for std::remove
 #endif
- class FileHandler
+class FileHandler
 {
 public:
 	static void removeDir(std::string path) {
@@ -22,18 +24,18 @@ public:
 	static void removeFile(std::string filepath) {
 		std::filesystem::remove(filepath);
 	}
-	
+
 	//For now just gets the temp directory
 	static std::string getWorkingDirectory() {
-			return std::filesystem::temp_directory_path().generic_string();
+		return std::filesystem::temp_directory_path().generic_string();
 	}
 
 	//removes problamatic values from the filename
 	static std::string sanitiseFileName(std::string filename) {
-		std::vector<char> prohibitedChars = {'#','/', '\\', ':', '*', '?', '<', '>', '|','"'};
+		std::vector<char> prohibitedChars = { '#','/', '\\', ':', '*', '?', '<', '>', '|','"' };
 
 		for (char item : prohibitedChars) {
-			filename.erase(std::remove(filename.begin(),filename.end(),item));
+			filename.erase(std::remove(filename.begin(), filename.end(), item), filename.end());
 		}
 		return filename;
 	}
@@ -41,7 +43,7 @@ public:
 
 	//Checks if a file exits and if createIfNotFound is set to true then the file/directory will be created
 	static bool checkIfExists(std::string filepath, bool createIfNotFound) {
-		
+
 		struct stat buffer;
 		bool result = stat(filepath.c_str(), &buffer) == 0;
 		try {
@@ -59,9 +61,10 @@ public:
 
 				}
 			}
-		}catch (const std::exception& e) {
-			
-			std::cout << "Encountered error using filepath: "+filepath <<"\n" << e.what() << "\n";
+		}
+		catch (const std::exception& e) {
+
+			std::cout << "Encountered error using filepath: " + filepath << "\n" << e.what() << "\n";
 			exit(-1);
 		}
 		return result;
@@ -75,18 +78,18 @@ public:
 	static void createImageFile(std::string filepath, std::string content) {
 		std::ofstream file;
 		file.open(filepath, std::ios_base::binary);
-		file.write(content.c_str(),content.size());
+		file.write(content.c_str(), content.size());
 		file.close();
 	}
 	static void mkdir(std::string filepath) {
 		std::filesystem::create_directories(filepath);
 	}
-	static void getFileInfo(std::string filename,std::vector<char>& content) {
-		
+	static void getFileInfo(std::string filename, std::vector<char>& content) {
+
 		std::ifstream file(filename, std::ios::binary);
-		file.seekg(0, SEEK_END);
+		file.seekg(0, std::ios_base::end);
 		size_t size = file.tellg();
-		file.seekg(0,SEEK_SET);
+		file.seekg(0, std::ios_base::beg);
 
 		content.resize(size);
 		file.read(content.data(), size);
@@ -94,7 +97,7 @@ public:
 	//lits all the folders ina a dir
 	static std::vector<std::string> listAllFoldersInDir(std::string path) {
 		std::vector<std::string> folders;
-		for (const auto & entry: std::filesystem::directory_iterator(path)) {
+		for (const auto& entry : std::filesystem::directory_iterator(path)) {
 			if (entry.is_directory()) {
 				folders.push_back(entry.path().string());
 			}
@@ -103,7 +106,7 @@ public:
 	}
 	static std::vector<std::string> listAllFilesInDir(std::string path) {
 		std::vector<std::string> files;
-		for (const auto & entry : std::filesystem::directory_iterator(path)) {
+		for (const auto& entry : std::filesystem::directory_iterator(path)) {
 			if (entry.is_regular_file()) {
 				files.push_back(entry.path().string());
 			}
@@ -114,11 +117,11 @@ public:
 	static std::vector<char>* readFile(std::string path) {
 		std::ifstream file(path, std::ios::binary | std::ios::ate);
 
-		file.seekg(0,std::ifstream::end);
+		file.seekg(0, std::ifstream::end);
 		int size = file.tellg();
 		file.seekg(0, std::ifstream::beg);
 
-		std::vector<char> *buffer = new std::vector<char>(size);
+		std::vector<char>* buffer = new std::vector<char>(size);
 		if (!file.read(buffer->data(), size)) {
 			std::cerr << "Failed to read file";
 			throw std::runtime_error("Failed to read file");
@@ -137,7 +140,7 @@ public:
 			removeFile(outputPath);
 		}
 
-		zip_t* archive = zip_open(outputPath.c_str(), ZIP_CREATE , &err);
+		zip_t* archive = zip_open(outputPath.c_str(), ZIP_CREATE, &err);
 		if (archive == nullptr) {
 			zip_error_t ziperror;
 			zip_error_init_with_code(&ziperror, err);
@@ -150,7 +153,7 @@ public:
 		}
 		for (std::string filepath : paths) {
 
-			std::vector<char> *fileContent = readFile(filepath);
+			std::vector<char>* fileContent = readFile(filepath);
 
 			if (fileContent->empty()) {
 				std::cerr << "Skipping file \n";
@@ -159,7 +162,7 @@ public:
 
 			zip_source_t* source = zip_source_buffer(archive, fileContent->data(), fileContent->size(), 0);
 
-			if (zip_file_add(archive, filepath.substr(inputDir.length()+1).c_str(), source, ZIP_FL_ENC_UTF_8) < 0) {
+			if (zip_file_add(archive, filepath.substr(inputDir.length() + 1).c_str(), source, ZIP_FL_ENC_UTF_8) < 0) {
 				std::cerr << "Failed to add file to archive: " + filepath + "\n";
 				zip_close(archive);
 				return;
@@ -171,5 +174,5 @@ public:
 			return;
 		}
 	}
-	
+
 };

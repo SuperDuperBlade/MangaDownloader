@@ -6,8 +6,6 @@ MangaDex::MangaDex(CmdParser* parser, Logger* logger, int argc, char* argv[]) {
 	this->init(argc, argv);
 }
 
-
-
 void MangaDex::init(int argc, char* argv[]) {
 
 
@@ -264,6 +262,7 @@ std::string MangaDex::sendRequestUsingBASEDOWNLOAD_URL(std::string addonURL) {
 bool MangaDex::writeMangaToDisk(std::string mode, std::string data_setting) {
 
 
+
 	if (!FileHandler::checkIfExists(this->outputDir, true)) {
 		logg->log("Dir:" + this->outputDir + " ,not found attempting to create");
 	}
@@ -280,6 +279,12 @@ bool MangaDex::writeMangaToDisk(std::string mode, std::string data_setting) {
 		logg->errorLog("Incorrect retrival method: " + method, true);
 
 	}
+	for (volumeInfo vi : manga.vinfos) {
+		for (chapterInfo ci : vi.chapters) {
+			logg->log("v" + vi.title + " c" + ci.chapter);
+		}
+	}
+
 	manga.title = getTitle();
 
 
@@ -313,28 +318,45 @@ bool MangaDex::writeMangaToDisk(std::string mode, std::string data_setting) {
 		FileHandler::createImageFile(base_DIR + "\\" + filename, coverBuffer);
 	}
 
+	
 
 	for (volumeInfo vinfo : manga.vinfos) {
 
 		//all the files in a specific volume go to the corrasponding directory
 		if (mode == "volume") {
 
-			if (volumeCounter < rangeMin) {
-				volumeCounter++;
-				continue;
-			}
-			if (isRangeSettingMax) {
-				if (volumeCounter > rangeMax) {
-					break;
+			if (this->isRangeEnabled) {
+				float currentVolume = std::stof(vinfo.title);
+				if (currentVolume < rangeMin) {
+					volumeCounter++;
+					continue;
+				}
+				if (this->isRangeSettingMax) {
+					if (currentVolume > rangeMax) {
+						break;
+					}
 				}
 			}
 
-			//checks if there are prevolumes (volumes labled 0)
-
-
 			//yes i know they are the same
-			if (method == 0) manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + name_prefix;
+			if (method == 0) manga_dir = base_DIR + "\\" + "v" + std::to_string(std::stoi(vinfo.title)+1) + "_" + name_prefix;
 			else if (method == 1) manga_dir = base_DIR + "\\" + "v" + std::to_string(volumeCounter) + "_" + name_prefix;
+
+			//checks if the cbz version already exists and does not continue if it does unless if it is the last volume (as some mangas are continueslly being updated)
+			if (FileHandler::checkIfExists(name_prefix + ".cbz", false)) {
+				
+				std::string nextMangaFile{};
+				if(method==0)
+				 nextMangaFile = base_DIR + "\\" + "v" + std::to_string(volumeCounter+1) + "_" + name_prefix+".cbz";
+				else if (method==1)  nextMangaFile = base_DIR + "\\" + "v" + vinfo.title + "_" + name_prefix;
+				if (FileHandler::checkIfExists(nextMangaFile,false)) {
+					//skips the volume
+					volumeCounter++;
+					logg->log("Skipping file as it already exits");
+					continue;
+				}
+			}
+
 			FileHandler::mkdir(manga_dir);
 
 		}
@@ -355,26 +377,47 @@ bool MangaDex::writeMangaToDisk(std::string mode, std::string data_setting) {
 			}
 			//all the files in a chapter go to a corrasponding directory
 			if (mode == "chapter") {
-
-				if (chapterCounter < rangeMin) {
-					chapterCounter++;
-					continue;
-				}
-				if (isRangeSettingMax) {
-					if (chapterCounter > rangeMax) {
-						break;
+				if (this->isRangeEnabled) {
+					float currentChapter = std::stof(cinfo.chapter);
+					if (currentChapter < rangeMin) {
+						chapterCounter++;
+						continue;
+					}
+					if (isRangeSettingMax) {
+						if (currentChapter > rangeMax) {
+							break;
+						}
 					}
 				}
-
 				if (method == 0) manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + "c" + cinfo.title + "_" + name_prefix;
 				else if (method == 1) manga_dir = base_DIR + "\\" + "v" + std::to_string(volumeCounter) + "c" + cinfo.chapter + "_" + FileHandler::sanitiseFileName(cinfo.title);
+
+
+				if (FileHandler::checkIfExists(manga_dir + ".cbz",false)) {
+					std::string next_manga_dir{};
+				
+					//only the first method supports it for now
+					
+						if (chapterCounter < vinfo.chapters.size()) {
+							if(method==1) next_manga_dir = base_DIR + "\\" + "v" + std::to_string(volumeCounter) + "c" + vinfo.chapters.at(chapterCounter).title + "_" + FileHandler::sanitiseFileName(cinfo.title)+".cbz";
+							else if (method==0)  next_manga_dir = base_DIR + "\\" + "v" + vinfo.title + "_" + "c" + vinfo.chapters.at(chapterCounter).title + "_" + name_prefix;
+							
+							if (FileHandler::checkIfExists(next_manga_dir, false)) { 
+								logg->log("Skipping file as it already exits");
+								continue; 
+							}
+						}
+						else {
+							//nothing
+						
+						}
+						
+					
+				}
 
 				//Creates the dir in advance
 				FileHandler::mkdir(manga_dir);
 			}
-
-
-
 
 			if (data_setting == "data") {
 
@@ -456,10 +499,12 @@ mangaInfo MangaDex::getMangaMetaDataSecondMethod() {
 	for (auto chap : json["data"].get_array()) {
 		chapterInfo cinfo;
 		auto volObj = chap["attributes"]["volume"];
-
+		auto ctitle = chap["attributes"]["volume"];
 
 		cinfo.id = convertFromViewToString(chap["id"].get_string().value());
-		cinfo.title = convertFromViewToString(chap["attributes"]["title"].get_string().value());
+		
+		if (!ctitle.is_null())cinfo.title = convertFromViewToString(ctitle.get_string().value());
+		else  cinfo.title = "";
 
 		//If the volume attribute is set to null .If so we shall replace it with 0 meaning that the volume is unordered
 		if (!volObj.is_null())	cinfo.volume = convertFromViewToString(volObj.get_string().value());
@@ -494,10 +539,14 @@ mangaInfo MangaDex::getMangaMetaDataSecondMethod() {
 			vinfo.chapters.push_back(cinfo);
 		}
 		else {
+			//switches to a new volume
 			mngInfo.vinfos.push_back(vinfo);
 			currentVolIter = currentVolIter + 1;
 			vinfo.chapters.clear();
 			vinfo.title = std::to_string(currentVolIter);
+
+			//adds the chapter to the next volume as it belongs there
+			vinfo.chapters.push_back(cinfo);
 		}
 	}
 	//returns the last volume
@@ -703,4 +752,3 @@ void MangaDex::checkForDuplicates(std::vector<chapterInfo>& cinfos){
 		}
 	}
 }
-

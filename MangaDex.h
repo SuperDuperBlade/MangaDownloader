@@ -63,6 +63,8 @@ class MangaDex
 
 		static bool isChapterLargerThanTheOther(chapterInfo const& cinfo1, chapterInfo const& cinfo2);
 
+		void checkForDuplicates(std::vector<chapterInfo>& cinfos);
+
 		//bool writeMangaToDisk(std::string mode);
 		std::string sendRequestUsingBASEURL(std::string addonURL);
 		

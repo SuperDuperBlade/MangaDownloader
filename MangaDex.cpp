@@ -331,10 +331,11 @@ mangaInfo MangaDex::getMangaMetaDataSecondMethod() {
 
 		cinfo.id = convertFromViewToString(chap["id"].get_string().value());
 		cinfo.title = convertFromViewToString(chap["attributes"]["title"].get_string().value());
+		
 		cinfo.volume = convertFromViewToString(chap["attributes"]["volume"].get_string().value());
 		cinfo.chapter = convertFromViewToString(chap["attributes"]["chapter"].get_string().value());
 
-		getFilesInChapter(&cinfo, cinfo.id);
+		//getFilesInChapter(&cinfo, cinfo.id);
 
 		//looks if the current chapter has a volume greater than the current one
 		if (std::stof(cinfo.volume) > highestVolume) {
@@ -344,13 +345,16 @@ mangaInfo MangaDex::getMangaMetaDataSecondMethod() {
 	}
 	//sorts the chapters in order
 	std::sort(cinfos.begin(), cinfos.end(), &isChapterLargerThanTheOther);
-
+	checkForDuplicates(cinfos);
 
 	int currentVolIter{ 1 };
 	volumeInfo vinfo;
+	
+	
+
 	for (chapterInfo cinfo : cinfos) {
 		logg->log("Volume: " + cinfo.volume + " , chapter: " + cinfo.chapter);
-
+		logg->log(cinfo.title);
 		if (currentVolIter == stoi(cinfo.volume)) {
 			vinfo.chapters.push_back(cinfo);
 		}
@@ -360,6 +364,7 @@ mangaInfo MangaDex::getMangaMetaDataSecondMethod() {
 			vinfo.chapters.clear();
 			vinfo.title = std::to_string(currentVolIter);
 		}
+		
 	}
 	//returns the last volume
 	mngInfo.vinfos.push_back(vinfo);
@@ -406,11 +411,13 @@ mangaInfo MangaDex::getMangaMetaData() {
 					try {
 						//most of the time mangaDex does not give the title so for now will just be using the chapter number
 						cinfo.title = convertFromViewToString(chapter_json["data"]["attributes"]["chapter"].get_string().value());
+						
 					}
 					catch (simdjson::simdjson_error e) {
 						logg->errorLog(e.what(), false);
 						logg->log("Title not found setting the title to blank");
 						cinfo.title = "";
+
 					}
 					getFilesInChapter(&cinfo, chapterID);
 
@@ -455,6 +462,9 @@ mangaInfo MangaDex::getMangaMetaData() {
 			}
 			//chapters are in reverse order unreverse them
 			std::reverse(vinfo.chapters.begin(), vinfo.chapters.end());
+			
+			checkForDuplicates(vinfo.chapters);
+
 			volumes.push_back(vinfo);
 
 			
@@ -516,3 +526,17 @@ bool MangaDex::isChapterLargerThanTheOther(chapterInfo const& cinfo1,chapterInfo
 	}
 	return false;
 }
+
+//checks for any duplicates and removes them
+void MangaDex::checkForDuplicates(std::vector<chapterInfo>& cinfos){
+	for (long i = 1; i < cinfos.size(); i++) {
+		chapterInfo	currentChapter = cinfos.at(i);
+		chapterInfo previousChapter = cinfos.at(i - 1);
+
+		//second translation is usally worse
+		if (currentChapter.chapter == previousChapter.chapter) {
+			cinfos.erase(cinfos.begin()+i);
+		}
+	}
+}
+

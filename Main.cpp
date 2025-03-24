@@ -9,7 +9,7 @@ int main(int argc,char* argv[]) {
 	//Handling and assining of the arguments
 
 	Logger logger;
-	CmdParser parser(true);
+	CmdParser parser(false);
 
 	MangaDex dex(&parser,&logger,argc,argv);
 

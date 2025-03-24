@@ -335,7 +335,7 @@ mangaInfo MangaDex::getMangaMetaDataSecondMethod() {
 		cinfo.volume = convertFromViewToString(chap["attributes"]["volume"].get_string().value());
 		cinfo.chapter = convertFromViewToString(chap["attributes"]["chapter"].get_string().value());
 
-		//getFilesInChapter(&cinfo, cinfo.id);
+		getFilesInChapter(&cinfo, cinfo.id);
 
 		//looks if the current chapter has a volume greater than the current one
 		if (std::stof(cinfo.volume) > highestVolume) {

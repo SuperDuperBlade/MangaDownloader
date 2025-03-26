@@ -1,4 +1,4 @@
-package util;
+package downloader.util;
 
 public class Arg {
     public String identifier;

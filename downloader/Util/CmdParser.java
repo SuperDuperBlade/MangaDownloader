@@ -1,4 +1,4 @@
-package downloader.util;
+package downloader.Util;
 
 import downloader.Main;
 
@@ -13,6 +13,7 @@ public class CmdParser {
     private HashMap<String ,String> proccessed = new HashMap<>();
     private boolean exitOnFailure = false;
 
+
     public CmdParser(String args[]){
         this.args = args;
     }
@@ -25,13 +26,29 @@ public class CmdParser {
         this.args = args;
         proccessArgument();
     }
+
+    //proccess the argument according to the args added to the class
     public void proccessArgument(){
         for (int i = 0; i < args.length; i++) {
             String user_Arg = args[i];
             Arg setting = getByIdentifier(user_Arg);
             if(setting != null){
                 if(setting.hasChild){
-                    proccessed.put(setting.identifier,args[i+1]);
+                    if(!setting.requiresSpecific) {
+                        proccessed.put(setting.identifier, args[i + 1]);
+                    }else {
+                        boolean isValid;
+                        String value;
+                        for(String msg: setting.accepted){
+                            if(msg.equalsIgnoreCase(args[i])){
+                                proccessed.put(setting.identifier,msg);
+                                return;
+                            }
+                        }
+
+                        logError("value: "+args[i+1]+ " did not match the required values attempting to set to default");
+                        proccessed.put(setting.identifier,setting.defualt);
+                    }
                 }else{
                     proccessed.put(setting.identifier,"true");
                 }
@@ -40,6 +57,7 @@ public class CmdParser {
             }
         }
     }
+    //prints all the args defined to this class
     public void printHelpMessage(){
         for (Arg arg:proccessor){
             System.out.println(arg.getArgMessage());

@@ -182,7 +182,7 @@ public class MangaDex {
         vinfo.title = String.valueOf(volumeCounter);
         for (chapterInfo cinfo: cinfos) {
             Main.debug(cinfo.volume + "v " +cinfo.chapter+" c"+volumeCounter);
-           
+           vinfo.cinfos.add(cinfo);
 
         }
         mngInfo.vinfos.add(vinfo);

@@ -1,11 +1,15 @@
 package downloader;
 
+import downloader.Downloader.MangaDex;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
+        MangaDex mangaDex = new MangaDex(args);
+        mangaDex.getMetaData();
+
     }
     public static void debug(String message){
         LocalDateTime localDateTime = LocalDateTime.now();

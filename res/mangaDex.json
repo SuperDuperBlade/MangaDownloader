@@ -1,11 +1,11 @@
 {
   "baseSite": "https://api.mangadex.org/",
-  "baseSite_MANGA": "/manga/",
-  "baseSite_COVER": "/cover/",
-  "baseSite_CHAPTER": "/chapter/",
-  "baseUrl_CHAPTER_IMAGES":"/at-home/server/",
+  "baseSite_MANGA": "https://api.mangadex.org/manga/",
+  "baseSite_COVER": "https://api.mangadex.org/cover/",
+  "baseSite_CHAPTER": "https://api.mangadex.org/chapter/",
+  "baseSite_CHAPTER_IMAGES":"https://api.mangadex.org/at-home/server/",
 
   "downloadSite_Data": "https://uploads.mangadex.org/data",
   "downloadSite_DataSaver": "https://uploads.mangadex.org/data-saver",
-  "downloadSite_COVER": "/covers/"
+  "downloadSite_COVER": "https://uploads.mangadex.org/covers/"
 }

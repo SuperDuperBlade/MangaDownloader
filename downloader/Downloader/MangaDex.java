@@ -78,7 +78,8 @@ public class MangaDex {
     modeIdentifier = "-m",
     rangeIdentifier = "-r",
     langIdentifier = "-l";
-
+    boolean isUsingRange = false, isRangeMaxEnabled = false;
+    float rangeMin= 0, rangeMax =0;
 
     public MangaDex(String[] args){
         this.cparser = new CmdParser(args);
@@ -88,6 +89,20 @@ public class MangaDex {
         this.cparser.addArgument(new Arg(rangeIdentifier,"The range of chapters/volumes to download",false,true));
         this.cparser.addArgument(new Arg(langIdentifier,"The language to download the manga in (shorthand)",false,true,"en"));
         this.cparser.proccessArgument();
+
+        isUsingRange = cparser.contains(rangeIdentifier);
+        if(isUsingRange){
+            String ranges[] = rangeIdentifier.split(":");
+            isRangeMaxEnabled = (ranges.length == 2);
+            if(ranges.length > 2){
+                new Exception("More ranges where supplied than added (2)");
+            } else{
+                rangeMin = Float.parseFloat(ranges[0]);
+                if (isRangeMaxEnabled) rangeMax = Float.parseFloat(ranges[1]);
+            }
+
+
+        }
 
         this.jparser = new JSONparser(Main.class.getClassLoader().getResource("mangaDex.json").getPath());
     }
@@ -232,7 +247,7 @@ public class MangaDex {
             }
 
         }
-     //   mngInfo.volumes.add(vinfo);
+         mngInfo.volumes.add(vinfo);
 
         for (volumeInfo vinfos : mngInfo.volumes){
             for (chapterInfo cinfo: vinfos.chapters) {
@@ -248,6 +263,30 @@ public class MangaDex {
         return Integer.parseInt(cinfos.get(cinfos.size()-1).volume) - Integer.parseInt(cinfos.get(0).volume);
     }
 
+    public boolean isInRange(chapterInfo chapterInfo){
 
-    
+        String mode = cparser.getValueFromArg(modeIdentifier);
+
+
+        if (mode.equalsIgnoreCase("volumes")|| mode.equalsIgnoreCase("volume")){
+            float volume = Float.parseFloat(chapterInfo.volume);
+            if (isRangeMaxEnabled){
+                return volume > rangeMin && volume < rangeMax;
+            }else{
+                return volume > rangeMin;
+            }
+        } else if (mode.equalsIgnoreCase("chapters")||mode.equalsIgnoreCase("chapter")) {
+            float chapter = Float.parseFloat(chapterInfo.chapter);
+            if (isRangeMaxEnabled){
+                return chapter >rangeMin && chapter < rangeMax;
+            }
+        }
+        //range is unsupported for this mode so will always return true
+        return true;
+    }
+
+    public void downloadManga(){
+
+    }
+
 }

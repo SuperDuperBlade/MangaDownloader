@@ -1,28 +1,34 @@
 package downloader.Downloader;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import downloader.Main;
 import downloader.Util.Arg;
 import downloader.Util.CmdParser;
+import downloader.Util.FileHandler;
 import downloader.Util.JSONparser;
 
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Map;
 
 public class MangaDex {
     private class mangaInfo{
        public String MangaId;
        public String title;
+       public String coverFileName;
        public ArrayList<volumeInfo> volumes = new ArrayList<>();
        public boolean hasUnorderedVolume;
 
@@ -121,7 +127,7 @@ public class MangaDex {
                     .uri(new URI(url))
                     .GET()
                     .timeout(Duration.ofSeconds(40))
-                    .header("Content-Type","application/json")
+                 //   .header("Content-Type","application/json")
                     .build();
 
 
@@ -130,7 +136,7 @@ public class MangaDex {
                 Main.debug("Request was successful: "+url);
                 return responce.body();
             }else if(responce.statusCode() == 429){
-                Main.debug("Encountered rate limit waiting "+rateLimit+" Seconds...");
+                Main.debug("Encountered rate limit waiting "+rateLimit+" seconds...");
                 Thread.sleep(rateLimit*1000);
                 return sendRequestViaBaseUrl(url);
             }else{
@@ -150,12 +156,14 @@ public class MangaDex {
 
     }
 
+
     public mangaInfo getMetaData(){
         mangaInfo mngInfo = new mangaInfo();
         float highestChapter = 0 , highestVolume = 1 ;
 
 
-
+        mngInfo.title = getTitle();
+        mngInfo.coverFileName = getCoverFileName();
 
         String url = jparser.getValue("baseSite_MANGA")
                 +cparser.getValueFromArg(mangaIdentifier)+
@@ -258,9 +266,36 @@ public class MangaDex {
         return mngInfo;
     }
 
+    private String getTitle() {
+      String responce =  sendRequestViaBaseUrl(jparser.getValue("baseSite_MANGA")+cparser.getValueFromArg(mangaIdentifier));
+      JsonObject jobj = JsonParser.parseString(responce).getAsJsonObject();
+      JsonObject dataObj = jobj.getAsJsonObject("data");
+      JsonObject attrributeObj = dataObj.getAsJsonObject("attributes");
+     JsonObject title = attrributeObj.getAsJsonObject("title");
+        Map.Entry<String, JsonElement> firstEntry = title.entrySet().iterator().next();
+     return firstEntry.getValue().toString();
+    }
+
 
     public int getVolumeRange(ArrayList<chapterInfo> cinfos){
         return Integer.parseInt(cinfos.get(cinfos.size()-1).volume) - Integer.parseInt(cinfos.get(0).volume);
+    }
+
+    public String getCoverFileName(){
+        String responce =  sendRequestViaBaseUrl(jparser.getValue("baseSite_MANGA")+cparser.getValueFromArg(mangaIdentifier));
+        JsonObject jobj = JsonParser.parseString(responce).getAsJsonObject();
+
+        JsonObject attributeObj = jobj.getAsJsonObject("data");
+        for (JsonElement el : attributeObj.getAsJsonArray("relationships")){
+            JsonObject arrayObj = el.getAsJsonObject();
+
+            JsonPrimitive typeObj = arrayObj.getAsJsonPrimitive("type");
+            String type = typeObj.getAsString();
+            if (type.equals("cover_art")){
+                return arrayObj.getAsJsonPrimitive("id").getAsString();
+            }
+        }
+        return null;
     }
 
     public boolean isInRange(chapterInfo chapterInfo){
@@ -285,7 +320,69 @@ public class MangaDex {
         return true;
     }
 
+    public void downloadImage(String url, String path){
+        Main.debug("Downloading image from: "+url);
+        try(InputStream in = new URL(url).openStream()){
+            Files.copy(in, Paths.get(path));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void downloadManga(){
+        //Gets the mangaMetadata
+        mangaInfo mangInfo = getMetaData();
+
+        String sanitisedTitle = FileHandler.sanitise(mangInfo.title);
+        String outdir = cparser.getValueFromArg(outDirIdentifier);
+        String mangaOutDir = cparser.getValueFromArg(outDirIdentifier)+"\\"+sanitisedTitle;
+        String fileDir = mangaOutDir;
+        //creates the Folder and downloads the cover
+        FileHandler.mkdir(mangaOutDir+"\\");
+
+        String coverFileNamePrefix = "\\00_cover"+sanitisedTitle;
+     //   String coverBuffer  =sendRequestViaBaseUrl(jparser.getValue("downloadSite_COVER")+cparser.getValueFromArg(mangaIdentifier)+"/"+mangInfo.coverFileName);
+
+        String mode = cparser.getValueFromArg(modeIdentifier);
+
+        long filecounter = 0;
+        for (volumeInfo vinfo: mangInfo.volumes){
+            fileDir = mangaOutDir;
+            if (mode.equalsIgnoreCase("Volume")||mode.equalsIgnoreCase("Volumes")){
+                fileDir += "\\"+vinfo.title+"v_"+sanitisedTitle;
+                FileHandler.mkdir(fileDir+"\\");
+                filecounter++;
+            } else if (mode.equalsIgnoreCase("Manga")) {
+                fileDir +=  "\\"+sanitisedTitle;
+            }
+            for (chapterInfo cinfo: vinfo.chapters){
+                if (!isInRange(cinfo)){
+                    continue;
+                }
+                if (mode.equalsIgnoreCase("Chapter")||mode.equalsIgnoreCase("Chapters")){
+                    fileDir += "\\"+vinfo.title+"v_"+cinfo.chapter+"c_"+sanitisedTitle;
+                    FileHandler.mkdir(fileDir);
+                    filecounter =0;
+                }
+
+                for (String filename :cinfo.filenames_data){
+                   // String responce  = sendRequestViaBaseUrl();
+                    String finalFilepath = fileDir+"\\"+String.valueOf(filecounter)+filename;
+                    downloadImage(jparser.getValue("downloadSite_Data")+"/"+cinfo.hash+"/"+filename,finalFilepath);
+                    filecounter++;
+                }
+
+            }
+        }
+        Path compilePath = Path.of(mangaOutDir);
+        try {
+            Files.walk(compilePath).filter(path -> Files.isDirectory(path)).forEach(path -> {
+                FileHandler.compressFolder(path.toAbsolutePath().toString());
+            });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
 
     }
 

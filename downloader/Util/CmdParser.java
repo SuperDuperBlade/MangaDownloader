@@ -49,11 +49,12 @@ public class CmdParser {
                         logError("value: "+args[i+1]+ " did not match the required values attempting to set to default");
                         proccessed.put(setting.identifier,setting.defualt);
                     }
+                    i++;
                 }else{
                     proccessed.put(setting.identifier,"true");
                 }
             }else{
-                logError("invalid arg");
+                logError("invalid arg"+user_Arg);
             }
         }
     }
@@ -79,7 +80,7 @@ public class CmdParser {
        boolean doesExist = false;
        Arg arg = getByIdentifier(identifier);
        if (arg == null) {
-           logError("Invalid identifier");
+           logError("Invalid identifier:"+identifier);
            return null;
        }
 
@@ -94,5 +95,5 @@ public class CmdParser {
         }
         return false;
     }
-    public boolean
+
 }

@@ -90,7 +90,7 @@ public class MangaDex {
         this.cparser.addArgument(new Arg(langIdentifier,"The language to download the manga in (shorthand)",false,true,"en"));
         this.cparser.proccessArgument();
 
-        isUsingRange = cparser.contains(rangeIdentifier);
+        isUsingRange = cparser.getValueFromArg(rangeIdentifier) !=null;
         if(isUsingRange){
             String ranges[] = rangeIdentifier.split(":");
             isRangeMaxEnabled = (ranges.length == 2);

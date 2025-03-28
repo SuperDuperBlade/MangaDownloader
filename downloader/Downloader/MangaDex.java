@@ -351,7 +351,7 @@ public class MangaDex {
             if (mode.equalsIgnoreCase("Volume")||mode.equalsIgnoreCase("Volumes")){
                 fileDir += "\\"+vinfo.title+"v_"+sanitisedTitle;
                 FileHandler.mkdir(fileDir+"\\");
-                filecounter++;
+                filecounter=0;
             } else if (mode.equalsIgnoreCase("Manga")) {
                 fileDir +=  "\\"+sanitisedTitle;
             }

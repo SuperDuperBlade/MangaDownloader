@@ -11,34 +11,63 @@ import downloader.Util.JSONparser;
 
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.net.Authenticator;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.PrimitiveIterator;
 
 public class MangaDex {
     private class mangaInfo{
        public String MangaId;
        public String title;
-       public ArrayList<volumeInfo> vinfos = new ArrayList<>();
+       public ArrayList<volumeInfo> volumes = new ArrayList<>();
        public boolean hasUnorderedVolume;
+
+       public void reset(){
+           MangaId = null;
+           title = null;
+           volumes.clear();
+           hasUnorderedVolume = false;
+       }
     }
     private class volumeInfo{
         public String title;
-        public ArrayList<chapterInfo> cinfos = new ArrayList<>();
+       public ArrayList<chapterInfo> chapters ;
+
+        public volumeInfo(String title,ArrayList<chapterInfo> chapterInfos){
+            this.title = title;
+            chapters = chapterInfos;
+        }
+        public volumeInfo(){
+            chapters =  new ArrayList<>();
+        }
+
+        public void reset(){
+            title = null;
+            chapters.clear();
+        }
+
+        public ArrayList<chapterInfo> getChapters() {
+            return chapters;
+        }
     }
     private class chapterInfo{
         public String id,title,hash,volume,chapter;
         public ArrayList<String> filenames_data = new ArrayList<>();
         public ArrayList<String> filenames_datasaver =new ArrayList<>();
 
+        public void reset(){
+            id = null;
+            title = null ;
+            hash = null;
+            volume = null;
+            chapter = null;
+            filenames_data.clear();
+            filenames_datasaver.clear();
+        }
     }
 
     private CmdParser cparser ;
@@ -109,6 +138,10 @@ public class MangaDex {
     public mangaInfo getMetaData(){
         mangaInfo mngInfo = new mangaInfo();
         float highestChapter = 0 , highestVolume = 1 ;
+
+
+
+
         String url = jparser.getValue("baseSite_MANGA")
                 +cparser.getValueFromArg(mangaIdentifier)+
                 "/feed?translatedLanguage[]="+cparser.getValueFromArg(langIdentifier);
@@ -175,20 +208,35 @@ public class MangaDex {
 
         //sorts them into volumes
 
-        float volumeCounter = 1;
+        float volumeCounter = Float.parseFloat(cinfos.get(0).volume);
+        int volumeRange = getVolumeRange(cinfos);
         if(mngInfo.hasUnorderedVolume) volumeCounter =0;
 
+
+
         volumeInfo vinfo = new volumeInfo();
-        vinfo.title = String.valueOf(volumeCounter);
+        vinfo.title = cinfos.get(0).volume;
         for (chapterInfo cinfo: cinfos) {
-            Main.debug(cinfo.volume + "v " +cinfo.chapter+" c"+volumeCounter);
-           vinfo.cinfos.add(cinfo);
+            if(Float.parseFloat(cinfo.volume) == volumeCounter){
+                vinfo.chapters.add(cinfo);
+            }else{
+                String title = vinfo.title;
+
+                mngInfo.volumes.add(vinfo);
+                vinfo = new volumeInfo();
+
+                volumeCounter++;
+                vinfo.title = String.valueOf(volumeCounter);
+                //this chapter belongs in the new volume
+                vinfo.chapters.add(cinfo);
+            }
 
         }
-        mngInfo.vinfos.add(vinfo);
+     //   mngInfo.volumes.add(vinfo);
 
-        for (volumeInfo vinfos : mngInfo.vinfos){
-            for (chapterInfo cinfo: vinfo.cinfos) {
+        for (volumeInfo vinfos : mngInfo.volumes){
+            for (chapterInfo cinfo: vinfos.chapters) {
+                Main.debug(String.valueOf(vinfos.chapters.size()));
                 Main.debug(vinfos.title + "v " +cinfo.chapter+" c");
             }
         }
@@ -196,6 +244,10 @@ public class MangaDex {
     }
 
 
+    public int getVolumeRange(ArrayList<chapterInfo> cinfos){
+        return Integer.parseInt(cinfos.get(cinfos.size()-1).volume) - Integer.parseInt(cinfos.get(0).volume);
+    }
 
 
+    
 }

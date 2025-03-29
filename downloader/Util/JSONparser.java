@@ -2,10 +2,7 @@ package downloader.Util;
 
 import com.google.gson.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +33,7 @@ public class JSONparser {
     public JSONparser(URL url){
         Gson gson = new Gson();
         try (FileReader reader = new FileReader(url.getPath())){
-            JsonArray jarray  =  JsonParser.parseReader(reader).getAsJsonArray();
+
 
 
             Map<String, String> data = gson.fromJson(reader,Map.class);
@@ -46,6 +43,18 @@ public class JSONparser {
 
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public JSONparser(InputStream inputStream){
+        Gson gson = new Gson();
+        try(BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
+            Map<String, String> data = gson.fromJson(br,Map.class);
+
+            vals = new HashMap<>(data);
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -88,22 +88,22 @@ public class MangaDex {
     boolean isUsingRange = false, isRangeMaxEnabled = false;
     float rangeMin= 0, rangeMax =0;
 
-    public MangaDex(String[] args){
+    public MangaDex(String[] args) {
         this.cparser = new CmdParser(args);
-        this.cparser.addArgument(new Arg(mangaIdentifier,"The id of the manga",true,true));
-        this.cparser.addArgument(new Arg(outDirIdentifier,"The id of the manga",false,true,System.getProperty("user.dir")));
-        this.cparser.addArgument(new Arg(modeIdentifier,"The way to download files in",false,true,"Volume",new String[]{"Volumes","Volume","Manga","Chapters","Chapter"}));
-        this.cparser.addArgument(new Arg(rangeIdentifier,"The range of chapters/volumes to download",false,true));
-        this.cparser.addArgument(new Arg(langIdentifier,"The language to download the manga in (shorthand)",false,true,"en"));
+        this.cparser.addArgument(new Arg(mangaIdentifier, "The id of the manga", true, true));
+        this.cparser.addArgument(new Arg(outDirIdentifier, "The id of the manga", false, true, System.getProperty("user.dir")));
+        this.cparser.addArgument(new Arg(modeIdentifier, "The way to download files in", false, true, "Volume", new String[]{"Volumes", "Volume", "Manga", "Chapters", "Chapter"}));
+        this.cparser.addArgument(new Arg(rangeIdentifier, "The range of chapters/volumes to download", false, true));
+        this.cparser.addArgument(new Arg(langIdentifier, "The language to download the manga in (shorthand)", false, true, "en"));
         this.cparser.proccessArgument();
 
-        isUsingRange = cparser.getValueFromArg(rangeIdentifier) !=null;
-        if(isUsingRange){
+        isUsingRange = cparser.getValueFromArg(rangeIdentifier) != null;
+        if (isUsingRange) {
             String ranges[] = rangeIdentifier.split(":");
             isRangeMaxEnabled = (ranges.length == 2);
-            if(ranges.length > 2){
+            if (ranges.length > 2) {
                 new Exception("More ranges where supplied than added (2)");
-            } else{
+            } else {
                 rangeMin = Float.parseFloat(ranges[0]);
                 if (isRangeMaxEnabled) rangeMax = Float.parseFloat(ranges[1]);
             }
@@ -111,9 +111,8 @@ public class MangaDex {
 
         }
 
-        this.jparser = new JSONparser(Main.class.getClassLoader().getResource("mangaDex.json").getPath());
+        this.jparser = new JSONparser(Main.class.getClassLoader().getResourceAsStream("mangaDex.json"));
     }
-
     public String sendRequestViaBaseUrl(String url){
 
         Main.debug("Sending Request to "+url);

@@ -1,9 +1,8 @@
 package downloader.Util;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStream;
+import downloader.Main;
+
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -52,11 +51,16 @@ public class FileHandler {
 
     public static void compressFolder(String dirPath){
         String outPath = dirPath + ".cbz";
+        File zip = new File(outPath);
         try {
+            if(zip.exists()){
+                File dir = new File(outPath);
+                dir.delete();
+            }
             Path zipPath = Files.createFile(Paths.get(outPath));
-            Path inputPath =  Paths.get(dirPath);
-            ZipOutputStream zout =  new ZipOutputStream((OutputStream) zipPath);
 
+            Path inputPath =  Paths.get(dirPath);
+            ZipOutputStream zout =  new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipPath.toString())));
 
             Files.walk(inputPath).filter(path ->!Files.isDirectory(path))
                     .forEach(path->{
@@ -74,6 +78,7 @@ public class FileHandler {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        Main.debug("Finished compiling: "+outPath);
     }
     public static String sanitise(String input){
         return input.replaceAll("[^a-zA-Z0-9\\._]+", "_");

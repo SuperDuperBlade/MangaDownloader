@@ -9,6 +9,7 @@ import downloader.Util.JSONparser;
 
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -322,6 +323,11 @@ public class MangaDex {
 
     public void downloadImage(String url, String path){
         Main.debug("Downloading image from: "+url);
+        if (FileHandler.doesExist(path)){
+            File fileToDelete = new File(path);
+            Main.debug("File already exits deleteing file and creating new one: "+path);
+            fileToDelete.delete();
+        }
         try(InputStream in = new URL(url).openStream()){
             Files.copy(in, Paths.get(path));
         } catch (IOException e) {
@@ -374,15 +380,18 @@ public class MangaDex {
 
             }
         }
-        Path compilePath = Path.of(mangaOutDir);
-        try {
-            Files.walk(compilePath).filter(path -> Files.isDirectory(path)).forEach(path -> {
-                FileHandler.compressFolder(path.toAbsolutePath().toString());
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
 
+
+
+    }
+    public void compile(String headDir){
+        File[] directories = new File(headDir).listFiles(File::isDirectory);
+
+//        Main.debug(String.valueOf(directories.length));
+        for (File dir: directories){
+            Main.debug("Now compiling "+dir.getAbsolutePath());
+            FileHandler.compressFolder(dir.getAbsolutePath());
+        }
 
     }
 

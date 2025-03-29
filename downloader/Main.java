@@ -8,8 +8,7 @@ import java.time.format.DateTimeFormatter;
 public class Main {
     public static void main(String[] args) {
         MangaDex mangaDex = new MangaDex(args);
-        mangaDex.compile("B:\\test\\Ijiranaide, Nagatoro-san");
-       // mangaDex.downloadManga();
+        mangaDex.downloadManga();
 
     }
     public static void debug(String message){

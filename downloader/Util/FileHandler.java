@@ -75,6 +75,14 @@ public class FileHandler {
                     });
 
             zout.close();
+            File dir = new File(dirPath);
+            if (dir.exists()){
+                File[] contents = dir.listFiles();
+                for (File f : contents){
+                    f.delete();
+                }
+                dir.delete();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

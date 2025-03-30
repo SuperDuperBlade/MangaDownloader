@@ -349,12 +349,26 @@ public class MangaDex {
         String mode = cparser.getValueFromArg(modeIdentifier);
 
         long filecounter = 0;
+        int volumeCounter = 0;
+        long chapterCounter = 0;
         for (volumeInfo vinfo: mangInfo.volumes){
             fileDir = mangaOutDir;
             if (mode.equalsIgnoreCase("Volume")||mode.equalsIgnoreCase("Volumes")){
                 fileDir += "\\"+vinfo.title+"v_"+sanitisedTitle;
-                FileHandler.mkdir(fileDir+"\\");
+
                 filecounter=0;
+
+                if (FileHandler.doesExist(fileDir+".cbz")){
+                    if (!(volumeCounter+1 >= mangInfo.volumes.size())){
+                        volumeInfo vinfo2 = mangInfo.volumes.get( (volumeCounter+1));
+                       String secondFile = mangaOutDir+"\\"+vinfo.title+"v_"+sanitisedTitle+".cbz";
+                       if (FileHandler.doesExist(secondFile)){
+                           continue;
+                       }
+                    }
+                }
+                FileHandler.mkdir(fileDir+"\\");
+
             } else if (mode.equalsIgnoreCase("Manga")) {
                 fileDir +=  "\\"+sanitisedTitle;
             }
@@ -364,21 +378,35 @@ public class MangaDex {
                 }
                 if (mode.equalsIgnoreCase("Chapter")||mode.equalsIgnoreCase("Chapters")){
                     fileDir += "\\"+vinfo.title+"v_"+cinfo.chapter+"c_"+sanitisedTitle;
+
+
+                    if (FileHandler.doesExist(fileDir+".cbz")){
+                        long nextInfoIndex = vinfo.chapters.indexOf(cinfo)+1;
+                        if (!(nextInfoIndex >= vinfo.chapters.size())){
+                            chapterInfo cinfo2 = new chapterInfo();
+                            String nextCBZ = mangaOutDir+"\\"+vinfo.title+"v_"+cinfo2.chapter+"c_"+sanitisedTitle+".cbz";
+                            if (FileHandler.doesExist(nextCBZ)){
+                                continue;
+                            }
+                        }
+                    }
                     FileHandler.mkdir(fileDir);
                     filecounter =0;
                 }
 
+                //checks if the cbz eqivelent already exits but continues to download if the next volume/chapter is missing
                 for (String filename :cinfo.filenames_data){
                    // String responce  = sendRequestViaBaseUrl();
                     String finalFilepath = fileDir+"\\"+String.valueOf(filecounter)+filename;
-                    downloadImage(jparser.getValue("downloadSite_Data")+"/"+cinfo.hash+"/"+filename,finalFilepath);
+                    if(!FileHandler.doesExist(finalFilepath)) downloadImage(jparser.getValue("downloadSite_Data")+"/"+cinfo.hash+"/"+filename,finalFilepath);
                     filecounter++;
                 }
 
             }
+            volumeCounter++;
         }
 
-
+        compile(mangaOutDir);
 
     }
     public void compile(String headDir){

@@ -9,7 +9,6 @@ import downloader.Util.JSONparser;
 
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -19,7 +18,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -393,5 +391,36 @@ public class MangaDex {
         }
 
     }
+    public float[] getHighestChapterAndVolume(){
+        float highestVolume=0, highestChapter =0;
 
+
+        String url = jparser.getValue("baseSite_MANGA")
+                +cparser.getValueFromArg(mangaIdentifier)+
+                "/feed?translatedLanguage[]="+cparser.getValueFromArg(langIdentifier);
+        JsonObject jobj = JsonParser.parseString(
+                        sendRequestViaBaseUrl(url))
+                .getAsJsonObject();
+
+        String limit = jobj.get("total").getAsString();
+        url+= "&limit="+limit;
+
+        jobj  = JsonParser.parseString(sendRequestViaBaseUrl(url)).getAsJsonObject();
+
+        ArrayList<chapterInfo> cinfos = new ArrayList<>();
+        for(JsonElement chapter: jobj.getAsJsonArray("data")){
+            JsonObject attributes = chapter.getAsJsonObject().getAsJsonObject("attributes");
+            float currentVolume =  attributes.get("volume").getAsFloat();
+            float currentChapter =  attributes.get("chapter").getAsFloat();
+            if(currentVolume > highestVolume){
+                highestVolume = currentVolume;
+            }
+
+            if (currentChapter > highestChapter){
+                highestChapter = currentChapter;
+            }
+        }
+        float toReturn[] = new float[]{highestVolume,highestChapter};
+        return toReturn;
+    }
 }

@@ -40,6 +40,7 @@ public class MangaDex {
     }
     private class volumeInfo{
         public String title;
+        public String coverUrl;
        public ArrayList<chapterInfo> chapters ;
 
         public volumeInfo(String title,ArrayList<chapterInfo> chapterInfos){
@@ -118,14 +119,16 @@ public class MangaDex {
         try {
             HttpClient hclient = HttpClient.newBuilder()
                     .followRedirects(HttpClient.Redirect.NORMAL)
-                    .connectTimeout(Duration.ofSeconds(24))
-
+                    .connectTimeout(Duration.ofSeconds(40))
+                    .version(HttpClient.Version.HTTP_1_1)
                     .build();
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(url))
                     .GET()
                     .timeout(Duration.ofSeconds(40))
-                 //   .header("Content-Type","application/json")
+
+
+                    //   .header("Content-Type","application/json")
                     .build();
 
 
@@ -166,14 +169,7 @@ public class MangaDex {
         String url = jparser.getValue("baseSite_MANGA")
                 +cparser.getValueFromArg(mangaIdentifier)+
                 "/feed?translatedLanguage[]="+cparser.getValueFromArg(langIdentifier);
-        JsonObject jobj = JsonParser.parseString(
-                sendRequestViaBaseUrl(url))
-                .getAsJsonObject();
-
-        String limit = jobj.get("total").getAsString();
-        url+= "&limit="+limit;
-
-        jobj  = JsonParser.parseString(sendRequestViaBaseUrl(url)).getAsJsonObject();
+        JsonObject jobj = getJsonFromUrlWithMaxLimit(url);
 
         ArrayList<chapterInfo> cinfos = new ArrayList<>();
         for(JsonElement chapter: jobj.getAsJsonArray("data")){
@@ -264,6 +260,34 @@ public class MangaDex {
                 Main.debug(vinfos.title + "v " +cinfo.chapter+" c");
             }
         }
+
+        //Get covers for volumes
+        String cover_url = jparser.getValue("baseSite_COVER")
+                +cparser.getValueFromArg(mangaIdentifier);
+        JsonObject coverObj= getJsonFromUrlWithMaxLimit(cover_url);
+
+        for(JsonElement cover: coverObj.getAsJsonArray("data")) {
+            JsonObject attributes = cover.getAsJsonObject().getAsJsonObject("attributes");
+            if (attributes.get("volume").isJsonNull()){
+                Main.debug("Skipping due to null volume");
+                continue;
+            }
+
+            String volume = attributes.get("volume").getAsString();
+            for (volumeInfo vinfoI:mngInfo.volumes){
+                if (vinfoI.title.equals(volume)){
+                    if (attributes.get("fileName").isJsonNull()){
+                        Main.debug("Skipping due to null url");
+                        continue;
+                    }
+                    vinfoI.coverUrl = attributes.get("fileName").getAsString();
+                    Main.debug("Found cover for volume: "+volume);
+                    break;
+                }
+            }
+
+        }
+
         return mngInfo;
     }
 
@@ -345,12 +369,14 @@ public class MangaDex {
         String fileDir = mangaOutDir;
         //creates the Folder and downloads the cover
         FileHandler.mkdir(mangaOutDir+"\\");
-
-        String coverFileNamePrefix = "\\00_cover"+sanitisedTitle;
-     //   String coverBuffer  =sendRequestViaBaseUrl(jparser.getValue("downloadSite_COVER")+cparser.getValueFromArg(mangaIdentifier)+"/"+mangInfo.coverFileName);
-
         String mode = cparser.getValueFromArg(modeIdentifier);
-
+        if (mangInfo.coverFileName !=null&& mangInfo.coverFileName != "") {
+            String coverFileNamePrefix = "\\00_cover" + mangInfo.coverFileName;
+            String coverUrl = jparser.getValue("downloadSite_COVER") + cparser.getValueFromArg(mangaIdentifier) + "/" + mangInfo.coverFileName;
+            if (mode.equalsIgnoreCase("manga")) {
+                downloadImage(coverUrl, fileDir + coverFileNamePrefix);
+            }
+        }
         long filecounter = 0;
         int volumeCounter = 0;
         long chapterCounter = 0;
@@ -358,6 +384,7 @@ public class MangaDex {
             fileDir = mangaOutDir;
             if (mode.equalsIgnoreCase("Volume")||mode.equalsIgnoreCase("Volumes")){
                 fileDir += "\\"+vinfo.title+"v_"+sanitisedTitle;
+
 
                 filecounter=0;
 
@@ -372,8 +399,16 @@ public class MangaDex {
                 }
                 FileHandler.mkdir(fileDir+"\\");
 
+                //Downloads the cover for the volume if not null
+                if (vinfo.coverUrl!=null&&vinfo.coverUrl!="") {
+                    String coverFilepath = fileDir + "\\" + "00_cover" + vinfo.title + "v_" + sanitisedTitle;
+                    downloadImage(jparser.getValue("downloadSite_COVER") + cparser.getValueFromArg(mangaIdentifier) + "/" + vinfo.coverUrl, coverFilepath);
+                }
             } else if (mode.equalsIgnoreCase("Manga")) {
                 fileDir +=  "\\"+sanitisedTitle;
+                FileHandler.mkdir(fileDir);
+
+
             }
             for (chapterInfo cinfo: vinfo.chapters){
                 if (!isInRange(cinfo)){
@@ -429,15 +464,7 @@ public class MangaDex {
         String url = jparser.getValue("baseSite_MANGA")
                 +cparser.getValueFromArg(mangaIdentifier)+
                 "/feed?translatedLanguage[]="+cparser.getValueFromArg(langIdentifier);
-        JsonObject jobj = JsonParser.parseString(
-                        sendRequestViaBaseUrl(url))
-                .getAsJsonObject();
-
-        String limit = jobj.get("total").getAsString();
-        url+= "&limit="+limit;
-
-        jobj  = JsonParser.parseString(sendRequestViaBaseUrl(url)).getAsJsonObject();
-
+        JsonObject jobj = getJsonFromUrlWithMaxLimit(url);
         ArrayList<chapterInfo> cinfos = new ArrayList<>();
         float previousChapter = 0;
         for(JsonElement chapter: jobj.getAsJsonArray("data")){
@@ -460,4 +487,37 @@ public class MangaDex {
         float toReturn[] = new float[]{highestVolume,highestChapter};
         return toReturn;
     }
+
+    public JsonObject getJsonFromUrlWithMaxLimit(String url){
+
+        JsonObject jobj = JsonParser.parseString(
+                        sendRequestViaBaseUrl(url))
+                .getAsJsonObject();
+
+        String limit = jobj.get("total").getAsString();
+        url+= "&limit="+limit;
+
+        jobj  = JsonParser.parseString(sendRequestViaBaseUrl(url)).getAsJsonObject();
+        return jobj;
+    }
+    public ArrayList<String> getMangaIDsFromAuthor(String author){
+        ArrayList<String> mangaIDS= new ArrayList<>();
+
+        JsonObject obj = JsonParser.parseString(sendRequestViaBaseUrl(jparser.getValue("baseSite_AUTHOR")+author)).getAsJsonObject();
+
+
+        JsonObject attributeObj = obj.getAsJsonObject("data");
+        for (JsonElement el : attributeObj.getAsJsonArray("relationships")) {
+            JsonObject arrayObj = el.getAsJsonObject();
+
+            JsonPrimitive typeObj = arrayObj.getAsJsonPrimitive("type");
+            String type = typeObj.getAsString();
+            if (type.equals("manga")){
+                mangaIDS.add(arrayObj.getAsJsonPrimitive("id").getAsString());
+            }
+
+        }
+        return mangaIDS;
+    }
+
 }

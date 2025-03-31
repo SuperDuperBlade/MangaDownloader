@@ -1,9 +1,10 @@
 {
   "baseSite": "https://api.mangadex.org/",
   "baseSite_MANGA": "https://api.mangadex.org/manga/",
-  "baseSite_COVER": "https://api.mangadex.org/cover/",
   "baseSite_CHAPTER": "https://api.mangadex.org/chapter/",
   "baseSite_CHAPTER_IMAGES":"https://api.mangadex.org/at-home/server/",
+  "baseSite_COVER": "https://api.mangadex.org/cover?order[volume]=asc&manga[]=",
+  "baseSite_AUTHOR": "https://api.mangadex.org/author?name=",
 
   "downloadSite_Data": "https://uploads.mangadex.org/data",
   "downloadSite_DataSaver": "https://uploads.mangadex.org/data-saver",

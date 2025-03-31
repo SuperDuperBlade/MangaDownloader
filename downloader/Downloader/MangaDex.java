@@ -158,7 +158,7 @@ public class MangaDex {
     public mangaInfo getMetaData(){
         mangaInfo mngInfo = new mangaInfo();
         float highestChapter = 0 , highestVolume = 1 ;
-
+        float previousChapter =0;
 
         mngInfo.title = getTitle();
         mngInfo.coverFileName = getCoverFileName();
@@ -194,8 +194,11 @@ public class MangaDex {
                 cinfo.volume =  attributes.get("volume").getAsString();
             }
 
-            cinfo.chapter = attributes.get("chapter").getAsString();
+            if (!attributes.get("chapter").isJsonNull()) cinfo.chapter = attributes.get("chapter").getAsString();
+            else cinfo.chapter = String.valueOf(previousChapter+0.00001);
 
+
+            previousChapter = Float.parseFloat(cinfo.chapter);
             //gets all the files in the chapter
             JsonObject chapterSiteObj = JsonParser.parseString(sendRequestViaBaseUrl(jparser.getValue("baseSite_CHAPTER_IMAGES")+cinfo.id)).getAsJsonObject();
 
@@ -436,10 +439,16 @@ public class MangaDex {
         jobj  = JsonParser.parseString(sendRequestViaBaseUrl(url)).getAsJsonObject();
 
         ArrayList<chapterInfo> cinfos = new ArrayList<>();
+        float previousChapter = 0;
         for(JsonElement chapter: jobj.getAsJsonArray("data")){
             JsonObject attributes = chapter.getAsJsonObject().getAsJsonObject("attributes");
             float currentVolume =  attributes.get("volume").getAsFloat();
-            float currentChapter =  attributes.get("chapter").getAsFloat();
+            float currentChapter =0.0f;
+            if (!attributes.get("chapter").isJsonNull()) currentChapter = attributes.get("chapter").getAsFloat();
+            else currentChapter =  (previousChapter+0.00001f);
+
+
+            previousChapter = currentChapter;
             if(currentVolume > highestVolume){
                 highestVolume = currentVolume;
             }

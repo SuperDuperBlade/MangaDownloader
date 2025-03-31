@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 public class Main {
     public static void main(String[] args) {
         MangaDex mangaDex = new MangaDex(args);
+        mangaDex.getHighestChapterAndVolume();
         mangaDex.downloadManga();
 
     }

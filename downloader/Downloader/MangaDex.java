@@ -264,7 +264,7 @@ public class MangaDex {
         return mngInfo;
     }
 
-    private String getTitle() {
+    public String getTitle() {
       String responce =  sendRequestViaBaseUrl(jparser.getValue("baseSite_MANGA")+cparser.getValueFromArg(mangaIdentifier));
       JsonObject jobj = JsonParser.parseString(responce).getAsJsonObject();
       JsonObject dataObj = jobj.getAsJsonObject("data");

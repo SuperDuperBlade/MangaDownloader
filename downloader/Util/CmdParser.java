@@ -40,7 +40,8 @@ public class CmdParser {
                         boolean isValid;
                         String value;
                         for(String msg: setting.accepted){
-                            if(msg.equalsIgnoreCase(args[i])){
+
+                            if(msg.equalsIgnoreCase(args[i+1])){
                                 proccessed.put(setting.identifier,msg);
                                 return;
                             }

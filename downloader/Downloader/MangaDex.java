@@ -11,9 +11,11 @@ import downloader.Util.JSONparser;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -78,7 +80,7 @@ public class MangaDex {
     }
 
     private CmdParser cparser ;
-    JSONparser jparser;
+    private  JSONparser jparser  = new JSONparser(MangaDex.class.getClassLoader().getResourceAsStream("mangaDex.json"));
     private int rateLimit = 20; //seconds
     private final String mangaIdentifier = "-i",
     outDirIdentifier = "-o",
@@ -87,6 +89,7 @@ public class MangaDex {
     langIdentifier = "-l";
     boolean isUsingRange = false, isRangeMaxEnabled = false;
     float rangeMin= 0, rangeMax =0;
+
 
     public MangaDex(String[] args) {
         this.cparser = new CmdParser(args);
@@ -113,6 +116,11 @@ public class MangaDex {
 
         this.jparser = new JSONparser(Main.class.getClassLoader().getResourceAsStream("mangaDex.json"));
     }
+
+    public MangaDex() {
+
+    }
+
     public String sendRequestViaBaseUrl(String url){
 
         Main.debug("Sending Request to "+url);
@@ -302,6 +310,15 @@ public class MangaDex {
      return firstEntry.getValue().toString();
     }
 
+    public String getTitle(String mangaID) {
+        String responce =  sendRequestViaBaseUrl(jparser.getValue("baseSite_MANGA")+mangaID);
+        JsonObject jobj = JsonParser.parseString(responce).getAsJsonObject();
+        JsonObject dataObj = jobj.getAsJsonObject("data");
+        JsonObject attrributeObj = dataObj.getAsJsonObject("attributes");
+        JsonObject title = attrributeObj.getAsJsonObject("title");
+        Map.Entry<String, JsonElement> firstEntry = title.entrySet().iterator().next();
+        return firstEntry.getValue().toString();
+    }
 
     public int getVolumeRange(ArrayList<chapterInfo> cinfos){
         return Integer.parseInt(cinfos.get(cinfos.size()-1).volume) - Integer.parseInt(cinfos.get(0).volume);
@@ -501,23 +518,38 @@ public class MangaDex {
         jobj  = JsonParser.parseString(sendRequestViaBaseUrl(url)).getAsJsonObject();
         return jobj;
     }
-    public ArrayList<String> getMangaIDsFromAuthor(String author){
+    public  ArrayList<String> getMangaIDsFromAuthor(String author){
         ArrayList<String> mangaIDS= new ArrayList<>();
 
-        JsonObject obj = JsonParser.parseString(sendRequestViaBaseUrl(jparser.getValue("baseSite_AUTHOR")+author)).getAsJsonObject();
+
+        try {
+           String params = URLEncoder.encode(author,"UTF-8");
+            String mainUrl = jparser.getValue("baseSite_AUTHOR");
+            if (mainUrl == null||mainUrl=="null")
+                mainUrl = "https://api.mangadex.org/author?name=";
+
+            String fullUrl = mainUrl+params;
+            String request= sendRequestViaBaseUrl(fullUrl);
+            JsonObject obj = JsonParser.parseString(request).getAsJsonObject();
 
 
-        JsonObject attributeObj = obj.getAsJsonObject("data");
-        for (JsonElement el : attributeObj.getAsJsonArray("relationships")) {
-            JsonObject arrayObj = el.getAsJsonObject();
+            JsonArray attributeObj = obj.getAsJsonArray("data");
+            JsonElement element = attributeObj.get(0);
+            JsonObject elOBj = element.getAsJsonObject();
+            for (JsonElement el : elOBj.getAsJsonArray("relationships")) {
+                JsonObject arrayObj = el.getAsJsonObject();
 
-            JsonPrimitive typeObj = arrayObj.getAsJsonPrimitive("type");
-            String type = typeObj.getAsString();
-            if (type.equals("manga")){
-                mangaIDS.add(arrayObj.getAsJsonPrimitive("id").getAsString());
+                JsonPrimitive typeObj = arrayObj.getAsJsonPrimitive("type");
+                String type = typeObj.getAsString();
+                if (type.equals("manga")){
+                    mangaIDS.add(arrayObj.getAsJsonPrimitive("id").getAsString());
+                }
+
             }
-
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
         }
+
         return mangaIDS;
     }
 

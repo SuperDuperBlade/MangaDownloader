@@ -89,6 +89,6 @@ public class FileHandler {
         Main.debug("Finished compiling: "+outPath);
     }
     public static String sanitise(String input){
-        return input.replaceAll("[^a-zA-Z0-9\\._? ,!]+", "_");
+        return input.replaceAll("[^a-zA-Z0-9\\._? ',!]+", "_");
     }
 }

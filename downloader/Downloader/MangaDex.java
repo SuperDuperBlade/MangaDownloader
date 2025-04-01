@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 public class MangaDex {
+    private static String FILESEPERATOR = File.separator;
     private class mangaInfo{
        public String MangaId;
        public String title;
@@ -365,13 +366,13 @@ public class MangaDex {
 
         String sanitisedTitle = FileHandler.sanitise(mangInfo.title);
         String outdir = cparser.getValueFromArg(outDirIdentifier);
-        String mangaOutDir = cparser.getValueFromArg(outDirIdentifier)+"\\"+sanitisedTitle;
+        String mangaOutDir = cparser.getValueFromArg(outDirIdentifier)+FILESEPERATOR+sanitisedTitle;
         String fileDir = mangaOutDir;
         //creates the Folder and downloads the cover
-        FileHandler.mkdir(mangaOutDir+"\\");
+        FileHandler.mkdir(mangaOutDir+FILESEPERATOR);
         String mode = cparser.getValueFromArg(modeIdentifier);
         if (mangInfo.coverFileName !=null&& mangInfo.coverFileName != "") {
-            String coverFileNamePrefix = "\\00_cover" + mangInfo.coverFileName;
+            String coverFileNamePrefix = FILESEPERATOR+"00_cover" + mangInfo.coverFileName;
             String coverUrl = jparser.getValue("downloadSite_COVER") + cparser.getValueFromArg(mangaIdentifier) + "/" + mangInfo.coverFileName;
             if (mode.equalsIgnoreCase("manga")) {
                 downloadImage(coverUrl, fileDir + coverFileNamePrefix);
@@ -383,7 +384,7 @@ public class MangaDex {
         for (volumeInfo vinfo: mangInfo.volumes){
             fileDir = mangaOutDir;
             if (mode.equalsIgnoreCase("Volume")||mode.equalsIgnoreCase("Volumes")){
-                fileDir += "\\"+vinfo.title+"v_"+sanitisedTitle;
+                fileDir += FILESEPERATOR+vinfo.title+"v_"+sanitisedTitle;
 
 
                 filecounter=0;
@@ -391,21 +392,21 @@ public class MangaDex {
                 if (FileHandler.doesExist(fileDir+".cbz")){
                     if (!(volumeCounter+1 >= mangInfo.volumes.size())){
                         volumeInfo vinfo2 = mangInfo.volumes.get( (volumeCounter+1));
-                       String secondFile = mangaOutDir+"\\"+vinfo.title+"v_"+sanitisedTitle+".cbz";
+                       String secondFile = mangaOutDir+FILESEPERATOR+vinfo.title+"v_"+sanitisedTitle+".cbz";
                        if (FileHandler.doesExist(secondFile)){
                            continue;
                        }
                     }
                 }
-                FileHandler.mkdir(fileDir+"\\");
+                FileHandler.mkdir(fileDir+FILESEPERATOR);
 
                 //Downloads the cover for the volume if not null
                 if (vinfo.coverUrl!=null&&vinfo.coverUrl!="") {
-                    String coverFilepath = fileDir + "\\" + "00_cover" + vinfo.title + "v_" + sanitisedTitle;
+                    String coverFilepath = fileDir + FILESEPERATOR + "00_cover" + vinfo.title + "v_" + sanitisedTitle;
                     downloadImage(jparser.getValue("downloadSite_COVER") + cparser.getValueFromArg(mangaIdentifier) + "/" + vinfo.coverUrl, coverFilepath);
                 }
             } else if (mode.equalsIgnoreCase("Manga")) {
-                fileDir +=  "\\"+sanitisedTitle;
+                fileDir +=  FILESEPERATOR+sanitisedTitle;
                 FileHandler.mkdir(fileDir);
 
 
@@ -415,14 +416,14 @@ public class MangaDex {
                     continue;
                 }
                 if (mode.equalsIgnoreCase("Chapter")||mode.equalsIgnoreCase("Chapters")){
-                    fileDir += "\\"+vinfo.title+"v_"+cinfo.chapter+"c_"+sanitisedTitle;
+                    fileDir += FILESEPERATOR+vinfo.title+"v_"+cinfo.chapter+"c_"+sanitisedTitle;
 
 
                     if (FileHandler.doesExist(fileDir+".cbz")){
                         long nextInfoIndex = vinfo.chapters.indexOf(cinfo)+1;
                         if (!(nextInfoIndex >= vinfo.chapters.size())){
                             chapterInfo cinfo2 = new chapterInfo();
-                            String nextCBZ = mangaOutDir+"\\"+vinfo.title+"v_"+cinfo2.chapter+"c_"+sanitisedTitle+".cbz";
+                            String nextCBZ = mangaOutDir+FILESEPERATOR+vinfo.title+"v_"+cinfo2.chapter+"c_"+sanitisedTitle+".cbz";
                             if (FileHandler.doesExist(nextCBZ)){
                                 continue;
                             }
@@ -435,7 +436,7 @@ public class MangaDex {
                 //checks if the cbz eqivelent already exits but continues to download if the next volume/chapter is missing
                 for (String filename :cinfo.filenames_data){
                    // String responce  = sendRequestViaBaseUrl();
-                    String finalFilepath = fileDir+"\\"+String.valueOf(filecounter)+filename;
+                    String finalFilepath = fileDir+FILESEPERATOR+String.valueOf(filecounter)+filename;
                     if(!FileHandler.doesExist(finalFilepath)) downloadImage(jparser.getValue("downloadSite_Data")+"/"+cinfo.hash+"/"+filename,finalFilepath);
                     filecounter++;
                 }

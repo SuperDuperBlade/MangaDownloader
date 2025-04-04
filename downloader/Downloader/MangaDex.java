@@ -216,6 +216,7 @@ public class MangaDex {
             JsonArray dataFiles  = chapterObj.get("data").getAsJsonArray();
             JsonArray dataSaverFiles = chapterObj.get("dataSaver").getAsJsonArray();
             for(JsonElement file:dataFiles){
+                Main.debug(file.getAsString());
                 cinfo.filenames_data.add(file.getAsString());
             }
             for(JsonElement file:dataSaverFiles){
@@ -267,6 +268,7 @@ public class MangaDex {
             for (chapterInfo cinfo: vinfos.chapters) {
                 Main.debug(String.valueOf(vinfos.chapters.size()));
                 Main.debug(vinfos.title + "v " +cinfo.chapter+" c");
+
             }
         }
 
@@ -279,22 +281,23 @@ public class MangaDex {
             JsonObject attributes = cover.getAsJsonObject().getAsJsonObject("attributes");
             if (attributes.get("volume").isJsonNull()){
                 Main.debug("Skipping due to null volume");
-                continue;
-            }
 
-            String volume = attributes.get("volume").getAsString();
-            for (volumeInfo vinfoI:mngInfo.volumes){
-                if (vinfoI.title.equals(volume)){
-                    if (attributes.get("fileName").isJsonNull()){
-                        Main.debug("Skipping due to null url");
-                        continue;
+            }else {
+
+                String volume = attributes.get("volume").getAsString();
+                for (volumeInfo vinfoI : mngInfo.volumes) {
+
+                    if (vinfoI.title.equals(volume)) {
+                        if (attributes.get("fileName").isJsonNull()) {
+                            Main.debug("Skipping due to null url");
+                            continue;
+                        }
+                        vinfoI.coverUrl = attributes.get("fileName").getAsString();
+                        Main.debug("Found cover for volume: " + volume);
+                        break;
                     }
-                    vinfoI.coverUrl = attributes.get("fileName").getAsString();
-                    Main.debug("Found cover for volume: "+volume);
-                    break;
                 }
             }
-
         }
 
         return mngInfo;
@@ -381,6 +384,7 @@ public class MangaDex {
         //Gets the mangaMetadata
         mangaInfo mangInfo = getMetaData();
 
+
         String sanitisedTitle = FileHandler.sanitise(mangInfo.title);
         String outdir = cparser.getValueFromArg(outDirIdentifier);
         String mangaOutDir = cparser.getValueFromArg(outDirIdentifier)+FILESEPERATOR+sanitisedTitle;
@@ -398,19 +402,24 @@ public class MangaDex {
         long filecounter = 0;
         int volumeCounter = 0;
         long chapterCounter = 0;
+
         for (volumeInfo vinfo: mangInfo.volumes){
+
             fileDir = mangaOutDir;
             if (mode.equalsIgnoreCase("Volume")||mode.equalsIgnoreCase("Volumes")){
                 fileDir += FILESEPERATOR+vinfo.title+"v_"+sanitisedTitle;
 
 
                 filecounter=0;
+                chapterCounter =0;
+
 
                 if (FileHandler.doesExist(fileDir+".cbz")){
                     if (!(volumeCounter+1 >= mangInfo.volumes.size())){
                         volumeInfo vinfo2 = mangInfo.volumes.get( (volumeCounter+1));
                        String secondFile = mangaOutDir+FILESEPERATOR+vinfo.title+"v_"+sanitisedTitle+".cbz";
                        if (FileHandler.doesExist(secondFile)){
+                           Main.debug("Skipping volume as it already exits");
                            continue;
                        }
                     }
@@ -429,10 +438,11 @@ public class MangaDex {
 
             }
             for (chapterInfo cinfo: vinfo.chapters){
-                if (!isInRange(cinfo)){
+                if (!isInRange(cinfo)&&isUsingRange){
                     continue;
                 }
                 if (mode.equalsIgnoreCase("Chapter")||mode.equalsIgnoreCase("Chapters")){
+                    fileDir = mangaOutDir;
                     fileDir += FILESEPERATOR+vinfo.title+"v_"+cinfo.chapter+"c_"+sanitisedTitle;
 
 
@@ -462,7 +472,7 @@ public class MangaDex {
             volumeCounter++;
         }
 
-        compile(mangaOutDir);
+       compile(mangaOutDir);
 
     }
     public void compile(String headDir){
@@ -487,7 +497,9 @@ public class MangaDex {
         float previousChapter = 0;
         for(JsonElement chapter: jobj.getAsJsonArray("data")){
             JsonObject attributes = chapter.getAsJsonObject().getAsJsonObject("attributes");
-            float currentVolume =  attributes.get("volume").getAsFloat();
+            float currentVolume =  0;
+            if (!attributes.get("volume").isJsonNull()) currentVolume = attributes.get("volume").getAsFloat();
+            else currentVolume =  0;
             float currentChapter =0.0f;
             if (!attributes.get("chapter").isJsonNull()) currentChapter = attributes.get("chapter").getAsFloat();
             else currentChapter =  (previousChapter+0.00001f);

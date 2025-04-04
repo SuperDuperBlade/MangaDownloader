@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         MangaDex mangaDex = new MangaDex(args);
 
-       mangaDex.downloadManga();
+        mangaDex.downloadManga();
     }
     public static void debug(String message){
         LocalDateTime localDateTime = LocalDateTime.now();

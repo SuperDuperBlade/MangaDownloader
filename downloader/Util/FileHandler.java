@@ -6,6 +6,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -35,6 +36,14 @@ public class FileHandler {
 
         File dir = new File(path);
         dir.mkdirs();
+
+        if (System.getProperty("os.name").toLowerCase() == "linux"){
+            try {
+                Files.setPosixFilePermissions(dir.toPath(), PosixFilePermissions.fromString("rwxrwxrwx"));
+            } catch (IOException e) {
+
+            }
+        }
     }
     public static void writeToFile(String path ,String content){
         File file = new File(path);
@@ -87,8 +96,31 @@ public class FileHandler {
             throw new RuntimeException(e);
         }
         Main.debug("Finished compiling: "+outPath);
+        if (System.getProperty("os.name").toLowerCase() == "linux"){
+            try {
+                Files.setPosixFilePermissions(zip.toPath(), PosixFilePermissions.fromString("rwxrwxrwx"));
+            } catch (IOException e) {
+
+            }
+        }
     }
     public static String sanitise(String input){
-        return input.replaceAll("[^a-zA-Z0-9\\._?\\- ',!]+", "");
+        // Replace forbidden characters for Windows
+        String sanitized = input.replaceAll("[\\\\/:*?\"<>|]", "");
+
+        // Remove control characters except common whitespace
+        sanitized = sanitized.replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", "");
+
+        // Trim and remove trailing dots/spaces
+        sanitized = sanitized.trim().replaceAll("[.\\s]+$", "");
+
+        // Truncate to the max allowed length
+        if (sanitized.length() > 259) {
+            sanitized = sanitized.substring(0, 259);
+            // Ensure again that no trailing space/dot after truncation
+            sanitized = sanitized.replaceAll("[.\\s]+$", "");
+        }
+
+        return sanitized;
     }
 }

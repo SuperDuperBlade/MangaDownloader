@@ -20,7 +20,9 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Map;
@@ -121,7 +123,7 @@ public class MangaDex {
 
     }
 
-    public String sendRequestViaBaseUrl(String url){
+    public  String sendRequestViaBaseUrl(String url){
 
         Main.debug("Sending Request to "+url);
 
@@ -216,7 +218,6 @@ public class MangaDex {
             JsonArray dataFiles  = chapterObj.get("data").getAsJsonArray();
             JsonArray dataSaverFiles = chapterObj.get("dataSaver").getAsJsonArray();
             for(JsonElement file:dataFiles){
-                Main.debug(file.getAsString());
                 cinfo.filenames_data.add(file.getAsString());
             }
             for(JsonElement file:dataSaverFiles){
@@ -287,7 +288,8 @@ public class MangaDex {
                 String volume = attributes.get("volume").getAsString();
                 for (volumeInfo vinfoI : mngInfo.volumes) {
 
-                    if (vinfoI.title.equals(volume)) {
+
+                    if (vinfoI.title.equals(String.valueOf(Float.parseFloat(volume)))) {
                         if (attributes.get("fileName").isJsonNull()) {
                             Main.debug("Skipping due to null url");
                             continue;
@@ -313,7 +315,7 @@ public class MangaDex {
      return firstEntry.getValue().toString();
     }
 
-    public String getTitle(String mangaID) {
+    public  String getTitle(String mangaID) {
         String responce =  sendRequestViaBaseUrl(jparser.getValue("baseSite_MANGA")+mangaID);
         JsonObject jobj = JsonParser.parseString(responce).getAsJsonObject();
         JsonObject dataObj = jobj.getAsJsonObject("data");
@@ -393,7 +395,7 @@ public class MangaDex {
         FileHandler.mkdir(mangaOutDir+FILESEPERATOR);
         String mode = cparser.getValueFromArg(modeIdentifier);
         if (mangInfo.coverFileName !=null&& mangInfo.coverFileName != "") {
-            String coverFileNamePrefix = FILESEPERATOR+"00_cover" + mangInfo.coverFileName;
+            String coverFileNamePrefix = FILESEPERATOR+"00_cover" +  mangInfo.coverFileName;
             String coverUrl = jparser.getValue("downloadSite_COVER") + cparser.getValueFromArg(mangaIdentifier) + "/" + mangInfo.coverFileName;
             if (mode.equalsIgnoreCase("manga")) {
                 downloadImage(coverUrl, fileDir + coverFileNamePrefix);
@@ -428,7 +430,7 @@ public class MangaDex {
 
                 //Downloads the cover for the volume if not null
                 if (vinfo.coverUrl!=null&&vinfo.coverUrl!="") {
-                    String coverFilepath = fileDir + FILESEPERATOR + "00_cover" + vinfo.title + "v_" + sanitisedTitle;
+                    String coverFilepath = fileDir + FILESEPERATOR + "00_cover" + vinfo.title + "v_" + sanitisedTitle+vinfo.coverUrl;
                     downloadImage(jparser.getValue("downloadSite_COVER") + cparser.getValueFromArg(mangaIdentifier) + "/" + vinfo.coverUrl, coverFilepath);
                 }
             } else if (mode.equalsIgnoreCase("Manga")) {
@@ -443,14 +445,17 @@ public class MangaDex {
                 }
                 if (mode.equalsIgnoreCase("Chapter")||mode.equalsIgnoreCase("Chapters")){
                     fileDir = mangaOutDir;
-                    fileDir += FILESEPERATOR+vinfo.title+"v_"+cinfo.chapter+"c_"+sanitisedTitle;
+
+                    String chapterTitle  = FileHandler.sanitise(cinfo.title);
+
+                    fileDir += FILESEPERATOR+vinfo.title+"v_"+cinfo.chapter+"c_"+chapterTitle;
 
 
                     if (FileHandler.doesExist(fileDir+".cbz")){
                         long nextInfoIndex = vinfo.chapters.indexOf(cinfo)+1;
                         if (!(nextInfoIndex >= vinfo.chapters.size())){
                             chapterInfo cinfo2 = new chapterInfo();
-                            String nextCBZ = mangaOutDir+FILESEPERATOR+vinfo.title+"v_"+cinfo2.chapter+"c_"+sanitisedTitle+".cbz";
+                            String nextCBZ = mangaOutDir+FILESEPERATOR+vinfo.title+"v_"+cinfo2.chapter+"c_"+chapterTitle+".cbz";
                             if (FileHandler.doesExist(nextCBZ)){
                                 continue;
                             }
@@ -472,8 +477,8 @@ public class MangaDex {
             volumeCounter++;
         }
 
-       compile(mangaOutDir);
-
+        compile(mangaOutDir);
+        createComicInfo(mangaOutDir);
     }
     public void compile(String headDir){
         File[] directories = new File(headDir).listFiles(File::isDirectory);
@@ -563,6 +568,50 @@ public class MangaDex {
         }
 
         return mangaIDS;
+    }
+
+    public final  String xmlInfoTemplate = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+            "<ComicInfo>\n" +
+            "  <Title>@title</Title>\n" +
+            "  <Summary>@summary</Summary>\n" +
+            "  <LanguageISO>@lang</LanguageISO>\n" +
+            "</ComicInfo>";
+
+
+    public void createComicInfo(String dirPath){
+        String responce =  sendRequestViaBaseUrl(jparser.getValue("baseSite_MANGA")+cparser.getValueFromArg(mangaIdentifier));
+        JsonObject jobj = JsonParser.parseString(responce).getAsJsonObject();
+        JsonObject dataObj = jobj.getAsJsonObject("data");
+        JsonObject attrributeObj = dataObj.getAsJsonObject("attributes");
+
+
+        String title = getTitle(cparser.getValueFromArg(mangaIdentifier));
+        String summery = "";
+        String lang  = cparser.getValueFromArg(langIdentifier);
+        for (Map.Entry<String, JsonElement> entry : attrributeObj.getAsJsonObject("description").entrySet()) {
+          if (lang.equalsIgnoreCase(entry.getKey())){
+              summery = entry.getValue().getAsString();
+          }
+        }
+
+
+        String mangaInfo = xmlInfoTemplate;
+
+       mangaInfo =  mangaInfo.replace("@title",title);
+        mangaInfo = mangaInfo.replace("@summary",summery);
+      mangaInfo =   mangaInfo.replaceAll("@lang",lang);
+
+
+        String path = dirPath + FILESEPERATOR +"ComicInfo.xml";
+
+        if (FileHandler.doesExist(path)){
+           File file = new File(path);
+           file.delete();
+        }
+
+       FileHandler.writeToFile(path,mangaInfo);
+
+
     }
 
 }

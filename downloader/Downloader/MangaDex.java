@@ -29,12 +29,15 @@ import java.util.Map;
 
 public class MangaDex {
     private static String FILESEPERATOR = File.separator;
+    public int maxNumberOfRetrys = 3;
+
     private class mangaInfo{
        public String MangaId;
        public String title;
        public String coverFileName;
        public ArrayList<volumeInfo> volumes = new ArrayList<>();
        public boolean hasUnorderedVolume;
+
 
        public void reset(){
            MangaId = null;
@@ -88,7 +91,8 @@ public class MangaDex {
     outDirIdentifier = "-o",
     modeIdentifier = "-m",
     rangeIdentifier = "-r",
-    langIdentifier = "-l";
+    langIdentifier = "-l",
+    multiThreadedIdentifier = "-mt";
     boolean isUsingRange = false, isRangeMaxEnabled = false;
     float rangeMin= 0, rangeMax =0;
 
@@ -96,10 +100,11 @@ public class MangaDex {
     public MangaDex(String[] args) {
         this.cparser = new CmdParser(args);
         this.cparser.addArgument(new Arg(mangaIdentifier, "The id of the manga", true, true));
-        this.cparser.addArgument(new Arg(outDirIdentifier, "The id of the manga", false, true, System.getProperty("user.dir")));
+        this.cparser.addArgument(new Arg(outDirIdentifier, "The out dir of the manga", false, true, System.getProperty("user.dir")));
         this.cparser.addArgument(new Arg(modeIdentifier, "The way to download files in", false, true, "Volume", new String[]{"Volumes", "Volume", "Manga", "Chapters", "Chapter"}));
         this.cparser.addArgument(new Arg(rangeIdentifier, "The range of chapters/volumes to download", false, true));
         this.cparser.addArgument(new Arg(langIdentifier, "The language to download the manga in (shorthand)", false, true, "en"));
+        this.cparser.addArgument(new Arg(multiThreadedIdentifier,"Download the manga in parallel while fetching",false,false));
         this.cparser.proccessArgument();
 
         isUsingRange = cparser.getValueFromArg(rangeIdentifier) != null;
@@ -123,8 +128,8 @@ public class MangaDex {
 
     }
 
-    public  String sendRequestViaBaseUrl(String url){
 
+    public String sendRequestViaBaseUrl_Retry(String url){
         Main.debug("Sending Request to "+url);
 
         try {
@@ -158,14 +163,32 @@ public class MangaDex {
             }
 
 
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | InterruptedException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
+    }
 
+    public  String sendRequestViaBaseUrl(String url) {
+
+        String responce = "";
+        for (int i = 0; i < maxNumberOfRetrys; i++) {
+
+
+         try {
+            responce = sendRequestViaBaseUrl_Retry(url);
+            break;
+        } catch (Exception e) {
+            e.printStackTrace();
+             try {
+                 Thread.sleep(1000);
+             } catch (InterruptedException ex) {
+                 throw new RuntimeException(ex);
+             }
+         }
+        }
+        return responce;
     }
 
 
@@ -368,7 +391,8 @@ public class MangaDex {
         return true;
     }
 
-    public void downloadImage(String url, String path){
+
+    public void downloadImage_Retry(String url, String path){
         Main.debug("Downloading image from: "+url);
         if (FileHandler.doesExist(path)){
             File fileToDelete = new File(path);
@@ -380,6 +404,26 @@ public class MangaDex {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void downloadImage(String url, String path){
+
+        for (int i = 0; i < maxNumberOfRetrys; i++) {
+
+
+            try {
+                downloadImage_Retry(url,path);
+              return;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 
     public void downloadManga(){
@@ -394,22 +438,20 @@ public class MangaDex {
         //creates the Folder and downloads the cover
         FileHandler.mkdir(mangaOutDir+FILESEPERATOR);
         String mode = cparser.getValueFromArg(modeIdentifier);
-        if (mangInfo.coverFileName !=null&& mangInfo.coverFileName != "") {
-            String coverFileNamePrefix = FILESEPERATOR+"00_cover" +  mangInfo.coverFileName;
-            String coverUrl = jparser.getValue("downloadSite_COVER") + cparser.getValueFromArg(mangaIdentifier) + "/" + mangInfo.coverFileName;
-            if (mode.equalsIgnoreCase("manga")) {
-                downloadImage(coverUrl, fileDir + coverFileNamePrefix);
-            }
-        }
+        String coverUrl = jparser.getValue("downloadSite_COVER") + cparser.getValueFromArg(mangaIdentifier) + "/" + mangInfo.coverFileName;
+
         long filecounter = 0;
         int volumeCounter = 0;
         long chapterCounter = 0;
-
+    long i =0;
         for (volumeInfo vinfo: mangInfo.volumes){
+
+
+
 
             fileDir = mangaOutDir;
             if (mode.equalsIgnoreCase("Volume")||mode.equalsIgnoreCase("Volumes")){
-                fileDir += FILESEPERATOR+vinfo.title+"v_"+sanitisedTitle;
+                fileDir += FILESEPERATOR+"Vol."+vinfo.title+" "+sanitisedTitle;
 
 
                 filecounter=0;
@@ -419,7 +461,7 @@ public class MangaDex {
                 if (FileHandler.doesExist(fileDir+".cbz")){
                     if (!(volumeCounter+1 >= mangInfo.volumes.size())){
                         volumeInfo vinfo2 = mangInfo.volumes.get( (volumeCounter+1));
-                       String secondFile = mangaOutDir+FILESEPERATOR+vinfo.title+"v_"+sanitisedTitle+".cbz";
+                       String secondFile = mangaOutDir+FILESEPERATOR+"Vol."+vinfo.title+" "+sanitisedTitle+".cbz";
                        if (FileHandler.doesExist(secondFile)){
                            Main.debug("Skipping volume as it already exits");
                            continue;
@@ -429,16 +471,17 @@ public class MangaDex {
                 FileHandler.mkdir(fileDir+FILESEPERATOR);
 
                 //Downloads the cover for the volume if not null
-                if (vinfo.coverUrl!=null&&vinfo.coverUrl!="") {
-                    String coverFilepath = fileDir + FILESEPERATOR + "00_cover" + vinfo.title + "v_" + sanitisedTitle+vinfo.coverUrl;
-                    downloadImage(jparser.getValue("downloadSite_COVER") + cparser.getValueFromArg(mangaIdentifier) + "/" + vinfo.coverUrl, coverFilepath);
-                }
+
+                createComicInfo(fileDir,vinfo.title,"Vol."+vinfo.title+ " "+mangInfo.title,mangInfo.title);
             } else if (mode.equalsIgnoreCase("Manga")) {
                 fileDir +=  FILESEPERATOR+sanitisedTitle;
                 FileHandler.mkdir(fileDir);
-
+                createComicInfo(fileDir,"1",mangInfo.title,mangInfo.title);
 
             }
+
+            boolean volumestart = true;
+
             for (chapterInfo cinfo: vinfo.chapters){
                 if (!isInRange(cinfo)&&isUsingRange){
                     continue;
@@ -448,14 +491,14 @@ public class MangaDex {
 
                     String chapterTitle  = FileHandler.sanitise(cinfo.title);
 
-                    fileDir += FILESEPERATOR+vinfo.title+"v_"+cinfo.chapter+"c_"+chapterTitle;
+                    fileDir += FILESEPERATOR+"Vol."+vinfo.title+" Ch."+cinfo.chapter+" - "+chapterTitle;
 
 
                     if (FileHandler.doesExist(fileDir+".cbz")){
                         long nextInfoIndex = vinfo.chapters.indexOf(cinfo)+1;
                         if (!(nextInfoIndex >= vinfo.chapters.size())){
                             chapterInfo cinfo2 = new chapterInfo();
-                            String nextCBZ = mangaOutDir+FILESEPERATOR+vinfo.title+"v_"+cinfo2.chapter+"c_"+chapterTitle+".cbz";
+                            String nextCBZ = mangaOutDir+FILESEPERATOR+"Vol."+vinfo.title+" Ch."+cinfo2.chapter+" - "+chapterTitle+".cbz";
                             if (FileHandler.doesExist(nextCBZ)){
                                 continue;
                             }
@@ -463,7 +506,18 @@ public class MangaDex {
                     }
                     FileHandler.mkdir(fileDir);
                     filecounter =0;
+
+                    createComicInfo(fileDir,cinfo.volume,cinfo.title,mangInfo.title, cinfo.chapter);
                 }
+
+
+
+
+                if (volumestart&&vinfo.coverUrl!=null&&vinfo.coverUrl!="") {
+                    String coverFilepath = fileDir + FILESEPERATOR + "0000_cover" + "Vol."+vinfo.title+" "+ sanitisedTitle+vinfo.coverUrl;
+                    downloadImage(jparser.getValue("downloadSite_COVER") + cparser.getValueFromArg(mangaIdentifier) + "/" + vinfo.coverUrl, coverFilepath);
+                }
+
 
                 //checks if the cbz eqivelent already exits but continues to download if the next volume/chapter is missing
                 for (String filename :cinfo.filenames_data){
@@ -473,12 +527,14 @@ public class MangaDex {
                     filecounter++;
                 }
 
+                volumestart = false;
+                i++;
             }
             volumeCounter++;
         }
 
         compile(mangaOutDir);
-        createComicInfo(mangaOutDir);
+
     }
     public void compile(String headDir){
         File[] directories = new File(headDir).listFiles(File::isDirectory);
@@ -570,22 +626,28 @@ public class MangaDex {
         return mangaIDS;
     }
 
-    public final  String xmlInfoTemplate = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-            "<ComicInfo>\n" +
-            "  <Title>@title</Title>\n" +
-            "  <Summary>@summary</Summary>\n" +
-            "  <LanguageISO>@lang</LanguageISO>\n" +
-            "</ComicInfo>";
 
 
-    public void createComicInfo(String dirPath){
+
+
+
+    public void createComicInfo(String dirPath,String volume,String title,String mangaTitle){
+
+
+        String xmlInfoTemplate = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<ComicInfo>\n" +
+                "<Series>@series<Series>\n" +
+                "  <Title>@title</Title>\n" +
+                "  <Summary>@summary</Summary>\n" +
+                " <Volume>@volume</Volume> \n" +
+                "  <LanguageISO>@lang</LanguageISO>\n" +
+                "</ComicInfo>";
         String responce =  sendRequestViaBaseUrl(jparser.getValue("baseSite_MANGA")+cparser.getValueFromArg(mangaIdentifier));
         JsonObject jobj = JsonParser.parseString(responce).getAsJsonObject();
         JsonObject dataObj = jobj.getAsJsonObject("data");
         JsonObject attrributeObj = dataObj.getAsJsonObject("attributes");
 
 
-        String title = getTitle(cparser.getValueFromArg(mangaIdentifier));
         String summery = "";
         String lang  = cparser.getValueFromArg(langIdentifier);
         for (Map.Entry<String, JsonElement> entry : attrributeObj.getAsJsonObject("description").entrySet()) {
@@ -600,6 +662,8 @@ public class MangaDex {
        mangaInfo =  mangaInfo.replace("@title",title);
         mangaInfo = mangaInfo.replace("@summary",summery);
       mangaInfo =   mangaInfo.replaceAll("@lang",lang);
+      mangaInfo = mangaInfo.replace("@volume",volume);
+      mangaInfo = mangaInfo.replace("@series",mangaTitle);
 
 
         String path = dirPath + FILESEPERATOR +"ComicInfo.xml";
@@ -614,4 +678,51 @@ public class MangaDex {
 
     }
 
+    public void createComicInfo(String dirPath,String volume,String title,String mangaTitle,String chapterNumber){
+
+
+        String xmlInfoTemplate = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
+                "<ComicInfo>\n" +
+                "<Series>@series</Series>\n" +
+                "  <Title>@title</Title>\n" +
+                "  <Summary>@summary</Summary>\n" +
+                " <Volume>@volume</Volume> \n" +
+                "<Number>@number</Number>\n"+
+                "  <LanguageISO>@lang</LanguageISO>\n" +
+                "</ComicInfo>";
+        String responce =  sendRequestViaBaseUrl(jparser.getValue("baseSite_MANGA")+cparser.getValueFromArg(mangaIdentifier));
+        JsonObject jobj = JsonParser.parseString(responce).getAsJsonObject();
+        JsonObject dataObj = jobj.getAsJsonObject("data");
+        JsonObject attrributeObj = dataObj.getAsJsonObject("attributes");
+
+
+        String summery = "";
+        String lang  = cparser.getValueFromArg(langIdentifier);
+        for (Map.Entry<String, JsonElement> entry : attrributeObj.getAsJsonObject("description").entrySet()) {
+            if (lang.equalsIgnoreCase(entry.getKey())){
+                summery = entry.getValue().getAsString();
+            }
+        }
+
+
+        String mangaInfo = xmlInfoTemplate;
+
+        mangaInfo =  mangaInfo.replace("@title",title);
+        mangaInfo = mangaInfo.replace("@summary",summery);
+        mangaInfo =   mangaInfo.replaceAll("@lang",lang);
+        mangaInfo = mangaInfo.replace("@volume",volume);
+        mangaInfo = mangaInfo.replace("@series",mangaTitle);
+        mangaInfo = mangaInfo.replace("@number",chapterNumber);
+
+        String path = dirPath + FILESEPERATOR +"ComicInfo.xml";
+
+        if (FileHandler.doesExist(path)){
+            File file = new File(path);
+            file.delete();
+        }
+
+        FileHandler.writeToFile(path,mangaInfo);
+
+
+    }
 }

@@ -491,19 +491,33 @@ public class MangaDex {
 
                     String chapterTitle  = FileHandler.sanitise(cinfo.title);
 
-                    fileDir += FILESEPERATOR+"Vol."+vinfo.title+" Ch."+cinfo.chapter+" - "+chapterTitle;
+
+
+
+                    fileDir += FILESEPERATOR+"Vol."+vinfo.title+" Ch."+cinfo.chapter;
+                    //check if chapter title is null or empty
+                    if(chapterTitle !=null &&  chapterTitle != ""){
+                        fileDir += " - "+chapterTitle;
+                        fileDir = fileDir.replaceAll("[.\\s]+$", "");
+                    }
 
 
                     if (FileHandler.doesExist(fileDir+".cbz")){
                         long nextInfoIndex = vinfo.chapters.indexOf(cinfo)+1;
                         if (!(nextInfoIndex >= vinfo.chapters.size())){
                             chapterInfo cinfo2 = new chapterInfo();
-                            String nextCBZ = mangaOutDir+FILESEPERATOR+"Vol."+vinfo.title+" Ch."+cinfo2.chapter+" - "+chapterTitle+".cbz";
+
+                          //  String nextCBZ = mangaOutDir+FILESEPERATOR+"Vol."+vinfo.title+" Ch."+cinfo2.chapter+" - "+chapterTitle+".cbz";
+                            String nextCBZ = mangaOutDir+FILESEPERATOR+"Vol."+vinfo.title+" Ch."+cinfo2.chapter;
+                            if(cinfo2.title != null && cinfo2.title != ""){
+                                nextCBZ += " - "+cinfo2.title;
+                            }
                             if (FileHandler.doesExist(nextCBZ)){
                                 continue;
                             }
                         }
                     }
+
                     FileHandler.mkdir(fileDir);
                     filecounter =0;
 

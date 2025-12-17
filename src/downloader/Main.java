@@ -44,7 +44,7 @@ public class Main {
     private static String getDate(){
         LocalDateTime localDateTime = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("[dd:MM:yyyy]");
-        return formatter.format(localDateTime);
+        return formatter.format(localDateTime).replace(":","_");
     }
     private static String getDateTime(){
         LocalDateTime localDateTime = LocalDateTime.now();

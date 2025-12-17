@@ -333,7 +333,7 @@ public class MangaDex {
       JsonObject jobj = JsonParser.parseString(responce).getAsJsonObject();
       JsonObject dataObj = jobj.getAsJsonObject("data");
       JsonObject attrributeObj = dataObj.getAsJsonObject("attributes");
-     JsonObject title = attrributeObj.getAsJsonObject("title");
+      JsonObject title = attrributeObj.getAsJsonObject("title");
         Map.Entry<String, JsonElement> firstEntry = title.entrySet().iterator().next();
      return firstEntry.getValue().toString();
     }

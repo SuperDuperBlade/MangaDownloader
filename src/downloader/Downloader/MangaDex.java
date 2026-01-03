@@ -592,7 +592,7 @@ public class MangaDex {
             else currentVolume =  0;
             float currentChapter =0.0f;
             if (!attributes.get("chapter").isJsonNull()) currentChapter = attributes.get("chapter").getAsFloat();
-            else currentChapter =  (previousChapter+0.001f);
+            else currentChapter =  (previousChapter+0.00001f);
 
 
             previousChapter = currentChapter;

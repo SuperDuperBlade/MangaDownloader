@@ -1,0 +1,7 @@
+(03:01:2026 21:13:29): Sending Request to https://api.mangadex.org/manga/null
+(03:01:2026 21:13:30): Encountered error code: 404
+(03:01:2026 21:13:30): {"result":"error","errors":[{"id":"524eb5f9-8408-5783-b4fc-5b176572e923","status":404,"title":"not_found_http_exception","detail":"No route found for \"GET https:\/\/api.mangadex.org\/manga\/null\"","context":null}]}
+(03:01:2026 21:13:30): Sending Request to https://api.mangadex.org/manga/null
+(03:01:2026 21:13:31): Encountered error code: 404
+(03:01:2026 21:13:31): {"result":"error","errors":[{"id":"524eb5f9-8408-5783-b4fc-5b176572e923","status":404,"title":"not_found_http_exception","detail":"No route found for \"GET https:\/\/api.mangadex.org\/manga\/null\"","context":null}]}
+(03:01:2026 21:13:31): [Ljava.lang.StackTraceElement;@23a5fd2

@@ -35,20 +35,20 @@ public class CmdParser {
             if(setting != null){
                 if(setting.hasChild){
                     if(!setting.requiresSpecific) {
-                        proccessed.put(setting.identifier, args[i + 1]);
+                        proccessed.put(setting.identifier, args[i + 1].trim());
                     }else {
                         boolean isValid;
                         String value;
                         for(String msg: setting.accepted){
 
                             if(msg.equalsIgnoreCase(args[i+1])){
-                                proccessed.put(setting.identifier,msg);
+                                proccessed.put(setting.identifier,msg.trim());
                                 return;
                             }
                         }
 
                         logError("value: "+args[i+1]+ " did not match the required values attempting to set to default");
-                        proccessed.put(setting.identifier,setting.defualt);
+                        proccessed.put(setting.identifier,setting.defualt.trim());
                     }
                     i++;
                 }else{

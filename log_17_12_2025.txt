@@ -1,4 +1,0 @@
-(17:12:2025 19:13:08): Sending Request to https://api.mangadex.org/manga/null
-(17:12:2025 19:13:09): Encountered error code: 404
-(17:12:2025 19:13:09): {"result":"error","errors":[{"id":"524eb5f9-8408-5783-b4fc-5b176572e923","status":404,"title":"not_found_http_exception","detail":"No route found for \"GET https:\/\/api.mangadex.org\/manga\/null\"","context":null}]}
-(17:12:2025 19:13:09): [Ljava.lang.StackTraceElement;@145eaa29

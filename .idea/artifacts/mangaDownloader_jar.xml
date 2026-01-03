@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="mangaDownloader:jar">
+    <output-path>E:/code/libs/custom</output-path>
+    <root id="archive" name="JFetcher.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="E:/code/libs/custom/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="module-output" name="JFetcher" />
+      <element id="extracted-dir" path="E:/code/libs/gson-2.13.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

@@ -13,7 +13,8 @@ public class Main {
     public static void main(String[] args) {
         try {
             MangaDex mangaDex = new MangaDex(args);
-            mangaDex.downloadManga();
+         mangaDex.downloadManga();
+
         }catch (Exception e){
             try {
                 writeToLogFile(getDateTime()+e.getStackTrace().toString());

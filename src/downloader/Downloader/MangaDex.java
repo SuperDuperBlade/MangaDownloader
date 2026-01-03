@@ -131,7 +131,7 @@ public class MangaDex {
 
     public String sendRequestViaBaseUrl_Retry(String url){
         Main.debug("Sending Request to "+url);
-
+        url = url.trim();
         try {
             HttpClient hclient = HttpClient.newBuilder()
                     .followRedirects(HttpClient.Redirect.NORMAL)
@@ -171,7 +171,7 @@ public class MangaDex {
     }
 
     public  String sendRequestViaBaseUrl(String url) {
-
+        url = url.trim();
         String responce = "";
         for (int i = 0; i < maxNumberOfRetrys; i++) {
 
@@ -329,18 +329,33 @@ public class MangaDex {
     }
 
     public String getTitle() {
-      String responce =  sendRequestViaBaseUrl(jparser.getValue("baseSite_MANGA")+cparser.getValueFromArg(mangaIdentifier));
-      JsonObject jobj = JsonParser.parseString(responce).getAsJsonObject();
-      JsonObject dataObj = jobj.getAsJsonObject("data");
-      JsonObject attrributeObj = dataObj.getAsJsonObject("attributes");
-      JsonObject title = attrributeObj.getAsJsonObject("title");
+      String responce =  sendRequestViaBaseUrl((jparser.getValue("baseSite_MANGA")+cparser.getValueFromArg(mangaIdentifier)).trim());
+        JsonObject jobj;
+        JsonObject title;
+        try {
+            jobj = JsonParser.parseString(responce).getAsJsonObject();
+            JsonObject dataObj = jobj.getAsJsonObject("data");
+            JsonObject attrributeObj = dataObj.getAsJsonObject("attributes");
+            title = attrributeObj.getAsJsonObject("title");
+        } catch (Exception e) {
+            // responce is useless return null
+            return  null;
+        }
+
         Map.Entry<String, JsonElement> firstEntry = title.entrySet().iterator().next();
      return firstEntry.getValue().toString();
     }
 
     public  String getTitle(String mangaID) {
-        String responce =  sendRequestViaBaseUrl(jparser.getValue("baseSite_MANGA")+mangaID);
-        JsonObject jobj = JsonParser.parseString(responce).getAsJsonObject();
+        String responce =  sendRequestViaBaseUrl(URLEncoder.encode(jparser.getValue("baseSite_MANGA")+mangaID.trim()));
+        JsonObject jobj;
+        try {
+            jobj = JsonParser.parseString(responce).getAsJsonObject();
+        } catch (Exception e) {
+            // responce is useless return null
+            return  null;
+        }
+
         JsonObject dataObj = jobj.getAsJsonObject("data");
         JsonObject attrributeObj = dataObj.getAsJsonObject("attributes");
         JsonObject title = attrributeObj.getAsJsonObject("title");
@@ -577,7 +592,7 @@ public class MangaDex {
             else currentVolume =  0;
             float currentChapter =0.0f;
             if (!attributes.get("chapter").isJsonNull()) currentChapter = attributes.get("chapter").getAsFloat();
-            else currentChapter =  (previousChapter+0.00001f);
+            else currentChapter =  (previousChapter+0.001f);
 
 
             previousChapter = currentChapter;
